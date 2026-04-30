@@ -1,0 +1,8189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>B737 MAX Aircraft CB Finder - Global Library</title>
+    <style>
+        :root { --neon: #00ff41; --bg: #0d0d0d; --card: #1a1a1a; --error: #ff3333; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Navbar */
+        .navbar { background: var(--card); padding: 15px 25px; display: flex; gap: 20px; align-items: center; border-bottom: 2px solid #333; flex-shrink: 0; }
+        .logo { color: var(--neon); font-weight: bold; font-size: 1.2rem; letter-spacing: 2px; }
+        select, input { background: #2a2a2a; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+
+        /* Yan Panel (Arama Sonuçları) */
+        .sidebar { width: 320px; background: #151515; border-right: 1px solid #333; overflow-y: auto; padding: 15px; transition: 0.3s; }
+        .result-item { 
+    background: #222; 
+    padding: 4px 10px; /* Padding düşürüldü (Eskisi 15px idi) */
+    margin-bottom: 3px;  /* Boşluk azaltıldı (Eskisi 12px idi) */
+    border-radius: 3px; 
+    cursor: pointer; 
+    border-left: 2px solid transparent; 
+    transition: 0.1s; 
+}
+        .result-item:hover { background: #2a2a2a; border-left-color: var(--neon); transform: translateX(5px); }
+        .res-panel-tag { 
+    font-size: 0.55rem; /* Font küçültüldü */
+    color: var(--neon); 
+    font-weight: 400; 
+    text-transform: uppercase; 
+    margin-bottom: 0px; 
+    display: block; 
+    opacity: 0.8;
+}
+        .res-text { font-size: 0.95rem; font-weight: 500; }
+
+        /* Görüntüleyici Bölgesi */
+        .viewer { flex: 1; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 30px; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%); }
+        .panel-wrap { position: relative; border: 2px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        #panel-img { display: block; max-height: 82vh; width: auto; }
+
+        /* Kırmızı Daire (Marker) */
+        .marker { position: absolute; border: 3px solid var(--error); border-radius: 50%; width: 60px; height: 60px; transform: translate(-50%, -50%); box-shadow: 0 0 20px var(--error), inset 0 0 10px var(--error); pointer-events: none; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; } }
+
+        .status-panel { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.85); padding: 12px 20px; border-radius: 6px; border-left: 4px solid var(--neon); font-size: 0.9rem; z-index: 100; }
+.search-container {
+    position: relative; /* Butonu içine sabitlemek için önemli */
+    display: flex;
+    align-items: center;
+}
+
+#searchBox {
+    width: 100%;
+    padding-right: 50px; /* Metnin butonun altına girmemesi için */
+}
+
+#clearBtn {
+    position: absolute;
+    right: 8px;
+    background: #444;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 10px;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+#clearBtn:hover {
+    background: #ff4444; /* Silme işlemi için kırmızı vurgu */
+    color: white;
+}
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    
+    
+    <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Sistem veya CB Ara (örn: MMR)..." autofocus>
+    <button id="clearBtn" type="button">X</button>
+    </div>
+<div class="logo">     B737 MAX CB FINDER  </div>
+    <select id="panelSelect">
+    <option value="">Panel Seçiniz...</option>
+    <option value="p6_1MAX">P6-1 MAX Navigation, Comm,entartainment,dsiplay </option>
+    <option value="p6_2MAX">P6-2 MAX Flight Control & Hydraulic, fire protection</option>
+    <option value="p6_3MAX">P6-3 MAX Fuel & Lighting, LG</option>
+    <option value="p6_4MAX">P6-4 MAX Air Conditioning & APU, cooling, electircal,pressurization</option>
+    <option value="p6_5MAX">P6-5 MAX Window Heat Left</option>
+    <option value="M1720_max">M1720 MAX Battery & Standby Bus SPCU</option>
+    <option value="p18_1MAX">P18-1 MAX Nav, AFCS,throttle</option>
+    <option value="p18_2MAX">P18-2 MAX Engine1, recorder,com,display </option>
+    <option value="p18_3MAX">P18-3 MAX Ice, light,signs,fire,air con,oxygen</option>
+    <option value="captltgmax">MAX Captain Lighting Panel</option>
+    <option value="foltgmax">MAX Emer & F/O Lighting Panel</option>
+ <option value="p91_MAX">MAX Power distrubition panel 91</option>
+<option value="p92max">MAX Power distrubition panel 92</option>
+
+
+
+</select>
+
+</div>
+
+<div class="main-content">
+    <div class="sidebar" id="sidebar">
+        <h3 style="color: #666; font-size: 0.9rem; margin-bottom: 20px; padding-left: 5px;">BULUNAN SONUÇLAR</h3>
+        <div id="resultsList">
+            <p style="color: #444; font-size: 0.85rem; padding-left: 5px;">Arama yapmak için en az 2 karakter girin.</p>
+        </div>
+    </div>
+    <div class="viewer">
+        <div class="panel-wrap" id="container">
+            <img src="" id="panel-img" style="display: none;">
+        </div>
+    </div>
+</div>
+
+<div class="status-panel" id="status">Sistem hazır.</div>
+
+<script>
+    // TÜM PANELLERDEKİ VERİLER (Buraya Python'dan çıkan tüm listeleri ekleyebilirsin)
+    const allPanelsData = {
+        "captltgmax":[
+    {
+        "text": "RUDDER PEDAL ADJUSTMENT",
+        "x": 50.46382189239333,
+        "y": 9.771754636233952
+    ,
+      "cb": "C0XX",
+      "location": ""
+    },
+        {
+            "text": "MCP C1",
+        "x": 11.131725417439704,
+        "y": 57.56062767475035
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C2",
+        "x": 10.575139146567718,
+        "y": 72.75320970042796
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C3",
+        "x": 26.65429808286951,
+        "y": 72.68188302425106
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C4",
+        "x": 42.67161410018553,
+        "y": 72.68188302425106
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C5",
+        "x": 58.68893011750155,
+        "y": 72.75320970042796
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C6",
+        "x": 74.76808905380335,
+        "y": 72.75320970042796
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C7",
+        "x": 90.97093382807668,
+        "y": 72.68188302425106
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CAPT'S PNL LTG",
+        "x": 34.01360544217687,
+        "y": 93.22396576319544
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CTR PNL LTG",
+        "x": 67.43970315398887,
+        "y": 93.33095577746077
+    ,
+      "cb": "",
+      "location": ""
+    }
+] ,
+    "foltgmax":[
+    {
+        "text": "RUDDER PEDAL ADJUSTMENT",
+        "x": 50.277435265104806,
+        "y": 10.099573257467995
+    ,
+      "cb": "",
+      "location": ""
+    },
+      {
+            "text": "BACM10R1AS",
+        "x": 49.38347718865598,
+        "y": 26.600284495021338
+    ,
+      "cb": "",
+      "location": "FO RUDDER PEDAL ADJUSTMENT PLACARD"
+    },
+        {
+            "text": "C1",
+        "x": 10.542540073982737,
+        "y": 72.9018492176387
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C2",
+        "x": 26.63378545006165,
+        "y": 72.97297297297297
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C3",
+        "x": 42.54007398273736,
+        "y": 72.9018492176387
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C4",
+        "x": 58.44636251541308,
+        "y": 72.9018492176387
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C5",
+        "x": 74.66091245376079,
+        "y": 72.97297297297297
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "C6",
+        "x": 90.6905055487053,
+        "y": 72.9018492176387
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EMER & F/O PNL LTG",
+        "x": 51.17139334155364,
+        "y": 93.45661450924608
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BACZZDCC2918",
+        "x": 74.29099876695437,
+        "y": 96.94167852062589,
+"cb": "",
+      "location": "EMER & F/O PNL LTG PLACARD"
+
+    }
+] ,
+    "M1720_max":[
+            {
+            "text": "BAT BUS SECT 3",
+        "x": 16.045197740112993,
+        "y": 29.929078014184395
+    ,
+      "cb": "C03063",
+      "location": "A1"
+    },
+        {
+            "text": "INVERTER VOLTS",
+        "x": 29.039548022598872,
+        "y": 29.929078014184395
+    ,
+      "cb": "C01053",
+      "location": "A2"
+    },
+        {
+            "text": "RCCB REMOTE",
+        "x": 54.57627118644067,
+        "y": 29.929078014184395
+    ,
+      "cb": "C01459",
+      "location": "A4"
+    },
+        {
+            "text": "INVERTER REMOTE",
+        "x": 67.909604519774,
+        "y": 29.929078014184395
+    ,
+      "cb": "C01343",
+      "location": "A5"
+    },
+        {
+            "text": "SPCU NORMAL",
+        "x": 16.045197740112993,
+        "y": 44.8936170212766
+    ,
+      "cb": "C01410",
+      "location": "B1"
+    },
+        {
+            "text": "SPCU STBY",
+        "x": 28.926553672316384,
+        "y": 44.8936170212766
+    ,
+      "cb": "C01411",
+      "location": "B2"
+    },
+        {
+            "text": "HOT BAT BUS",
+        "x": 41.5819209039548,
+        "y": 44.8936170212766
+    ,
+      "cb": "C02022",
+      "location": "B3"
+    },
+        {
+            "text": "SW HOT BAT BUS",
+        "x": 54.80225988700565,
+        "y": 44.8936170212766
+    ,
+      "cb": "C00169",
+      "location": "B4"
+    },
+        {
+            "text": "BAT/STBY SW POS IND",
+        "x": 67.79661016949152,
+        "y": 44.82269503546099
+    ,
+      "cb": "C01426",
+      "location": "B5"
+    },
+        {
+            "text": "STBY BUS SECT 1",
+        "x": 16.045197740112993,
+        "y": 58.86524822695035
+    ,
+      "cb": "C03066",
+      "location": "C1"
+    },
+        {
+            "text": "STBY BUS SECT 2",
+        "x": 29.039548022598872,
+        "y": 58.86524822695035
+    ,
+      "cb": "C03067",
+      "location": "C2"
+    },
+        {
+            "text": "TR3 DC IND",
+        "x": 41.80790960451977,
+        "y": 58.93617021276596
+    ,
+      "cb": "C00025",
+      "location": "C3"
+    },
+        {
+            "text": "BAT BUS SECT 1",
+        "x": 55.028248587570616,
+        "y": 58.86524822695035
+    ,
+      "cb": "C03061",
+      "location": "C4"
+    },
+        {
+            "text": "BAT BUS SECT 2",
+        "x": 67.79661016949152,
+        "y": 58.86524822695035
+    ,
+      "cb": "C03062",
+      "location": "C5"
+    },
+        {
+            "text": "28 VDC SPCU",
+        "x": 41.80790960451977,
+        "y": 63.262411347517734
+    }
+] ,
+   
+//BURDAN DEVAM 
+ "p18_1MAX":[
+    {
+        "text": "BAC2ZDCC2898",
+        "x": 88.00366300366301,
+        "y": 1.634683724235963
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RADIO NAVIGATION",
+        "x": 51.098901098901095,
+        "y": 2.345415778251599
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NAV",
+        "x": 38.82783882783883,
+        "y": 4.832977967306325
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ADF",
+        "x": 51.19047619047619,
+        "y": 5.330490405117271
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MMR",
+        "x": 26.190476190476193,
+        "y": 6.2544420753375976
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT PNL",
+        "x": 38.73626373626374,
+        "y": 6.325515280739161
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "A_",
+        "x": 5.86080586080586,
+        "y": 10.803127221037668
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2H",
+        "x": 26.190476190476193,
+        "y": 13.148542999289267
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27)",
+        "x": 38.82783882783883,
+        "y": 13.361762615493959
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2H",
+        "x": 51.64835164835166,
+        "y": 13.148542999289267
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC2ZDCC7734",
+        "x": 88.36996336996337,
+        "y": 21.108742004264393
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NAV",
+        "x": 13.644688644688644,
+        "y": 24.16488983653163
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RADIO",
+        "x": 51.28205128205128,
+        "y": 24.16488983653163
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GND",
+        "x": 88.82783882783882,
+        "y": 24.16488983653163
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SNSR",
+        "x": 13.644688644688644,
+        "y": 25.657427149964462
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DME",
+        "x": 38.73626373626374,
+        "y": 25.657427149964462
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ALTM",
+        "x": 51.373626373626365,
+        "y": 25.657427149964462
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ATC",
+        "x": 64.1025641025641,
+        "y": 25.657427149964462
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PROX",
+        "x": 88.82783882783882,
+        "y": 25.657427149964462
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC-1",
+        "x": 13.553113553113553,
+        "y": 27.078891257995735
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TCAS",
+        "x": 76.64835164835165,
+        "y": 27.078891257995735
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WARN",
+        "x": 88.91941391941391,
+        "y": 27.078891257995735
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "B",
+        "x": 5.952380952380952,
+        "y": 30.2771855010661
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2H)",
+        "x": 13.827838827838828,
+        "y": 32.48045486851457
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27)",
+        "x": 39.010989010989015,
+        "y": 32.55152807391614
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2",
+        "x": 51.64835164835166,
+        "y": 32.48045486851457
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 63.827838827838825,
+        "y": 32.33830845771145
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 76.37362637362637,
+        "y": 32.33830845771145
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2H",
+        "x": 89.65201465201466,
+        "y": 32.48045486851457
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS",
+        "x": 45.05494505494506,
+        "y": 39.01918976545842
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC2ZDCC2736",
+        "x": 88.18681318681318,
+        "y": 38.80597014925373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SYS A",
+        "x": 57.6007326007326,
+        "y": 40.582800284292816
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MACH",
+        "x": 51.19047619047619,
+        "y": 42.00426439232409
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SNSR",
+        "x": 63.827838827838825,
+        "y": 42.00426439232409
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "YAW",
+        "x": 82.5091575091575,
+        "y": 42.430703624733475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TRIM",
+        "x": 51.098901098901095,
+        "y": 43.49680170575693
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXC",
+        "x": 63.73626373626373,
+        "y": 43.49680170575693
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DAMPER",
+        "x": 82.5091575091575,
+        "y": 43.85216773276475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 51.19047619047619,
+        "y": 44.989339019189764
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 63.73626373626373,
+        "y": 44.989339019189764
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 89.46886446886447,
+        "y": 45.41577825159915
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 51.373626373626365,
+        "y": 51.59914712153518
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 89.56043956043956,
+        "y": 51.385927505330486
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS",
+        "x": 45.05494505494506,
+        "y": 58.91968727789624
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BACZZDCC2738",
+        "x": 87.95787545787546,
+        "y": 58.56432125088842
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SYS A",
+        "x": 31.684981684981683,
+        "y": 60.5543710021322
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "YAW",
+        "x": 82.05128205128204,
+        "y": 60.62544420753376
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WARN",
+        "x": 13.644688644688644,
+        "y": 62.046908315565034
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MACH",
+        "x": 51.28205128205128,
+        "y": 62.046908315565034
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DAMPER",
+        "x": 82.14285714285714,
+        "y": 62.046908315565034
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LIGHT",
+        "x": 13.553113553113553,
+        "y": 63.46837242359631
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FCC",
+        "x": 26.098901098901102,
+        "y": 63.46837242359631
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGAGE",
+        "x": 38.64468864468865,
+        "y": 63.46837242359631
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TRIM",
+        "x": 51.19047619047619,
+        "y": 63.46837242359631
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MCP",
+        "x": 63.91941391941391,
+        "y": 63.46837242359631
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2",
+        "x": 76.55677655677655,
+        "y": 63.61051883439943
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "(BAT)",
+        "x": 13.461538461538462,
+        "y": 65.0319829424307
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 26.098901098901102,
+        "y": 64.96090973702914
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INTLK",
+        "x": 38.553113553113555,
+        "y": 64.96090973702914
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 51.28205128205128,
+        "y": 64.96090973702914
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC 1",
+        "x": 63.64468864468864,
+        "y": 64.96090973702914
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 76.64835164835165,
+        "y": 65.0319829424307
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 89.1025641025641,
+        "y": 65.0319829424307
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "D",
+        "x": 6.227106227106227,
+        "y": 67.73276474769013
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 13.36996336996337,
+        "y": 71.57071783937455
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 25.91575091575092,
+        "y": 71.28642501776831
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 38.36996336996337,
+        "y": 71.28642501776831
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 51.28205128205128,
+        "y": 71.57071783937455
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 63.827838827838825,
+        "y": 71.42857142857143
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 76.46520146520146,
+        "y": 71.42857142857143
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 89.28571428571429,
+        "y": 71.57071783937455
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC2ZDCC3329",
+        "x": 87.91208791208791,
+        "y": 77.5408670931059
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ADIRU",
+        "x": 76.0989010989011,
+        "y": 80.81023454157783
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUTOTHROTTLE -",
+        "x": 26.923076923076923,
+        "y": 82.16062544420754
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 76.19047619047619,
+        "y": 82.30277185501066
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC 1",
+        "x": 13.553113553113553,
+        "y": 83.72423596304193
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 64.01098901098901,
+        "y": 83.65316275764036
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 89.37728937728939,
+        "y": 83.65316275764036
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "E",
+        "x": 6.318681318681318,
+        "y": 86.99360341151386
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "7Y2",
+        "x": 13.553113553113553,
+        "y": 89.97867803837953
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "10",
+        "x": 64.1941391941392,
+        "y": 90.04975124378109
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 89.1941391941392,
+        "y": 89.8365316275764
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2",
+        "x": 25.73260073260073,
+        "y": 95.38024164889836
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 38.553113553113555,
+        "y": 95.38024164889836
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "4",
+        "x": 51.098901098901095,
+        "y": 95.38024164889836
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 63.55311355311355,
+        "y": 95.45131485429992
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "6",
+        "x": 76.28205128205127,
+        "y": 95.38024164889836
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "P18-1",
+        "x": 8.699633699633699,
+        "y": 99.00497512437812
+    }
+] ,
+    "p18_2MAX":[
+    {
+        "text": "BACZTDCC2B37",
+        "x": 56.43678160919541,
+        "y": 15.443425076452598
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGINE",
+        "x": 18.448275862068968,
+        "y": 16.36085626911315
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ALTN PWR",
+        "x": 28.160919540229884,
+        "y": 17.660550458715598
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FMCS",
+        "x": 40.45977011494253,
+        "y": 17.737003058103976
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "IGNITION",
+        "x": 12.988505747126435,
+        "y": 18.960244648318042
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CHAN",
+        "x": 25.0,
+        "y": 19.113149847094803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CHAN",
+        "x": 31.091954022988507,
+        "y": 19.113149847094803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CMPTR",
+        "x": 37.52873563218391,
+        "y": 19.113149847094803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MCDU",
+        "x": 43.735632183908045,
+        "y": 19.113149847094803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DATA",
+        "x": 55.91954022988506,
+        "y": 19.113149847094803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 6.379310344827586,
+        "y": 20.33639143730887
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 18.79310344827586,
+        "y": 20.33639143730887
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LOADER",
+        "x": 55.97701149425287,
+        "y": 20.33639143730887
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 6.321839080459771,
+        "y": 25.229357798165136
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 18.79310344827586,
+        "y": 25.229357798165136
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 25.0,
+        "y": 25.15290519877676
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28",
+        "x": 31.20689655172414,
+        "y": 25.30581039755352
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BACZZDCC20J2",
+        "x": 61.724137931034484,
+        "y": 32.26299694189603
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGINE",
+        "x": 27.52873563218391,
+        "y": 33.25688073394495
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "START LEVER",
+        "x": 9.655172413793103,
+        "y": 34.63302752293578
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "THRUST REVERSER",
+        "x": 34.08045977011494,
+        "y": 34.63302752293578
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FMCS",
+        "x": 62.12643678160919,
+        "y": 34.63302752293578
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CHAN",
+        "x": 6.379310344827586,
+        "y": 35.932721712538225
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CHAN",
+        "x": 12.586206896551724,
+        "y": 35.932721712538225
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RUN/",
+        "x": 18.908045977011493,
+        "y": 35.85626911314985
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SYNC",
+        "x": 43.735632183908045,
+        "y": 35.932721712538225
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "START",
+        "x": 49.712643678160916,
+        "y": 35.932721712538225
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BITE",
+        "x": 62.1551724137931,
+        "y": 35.85626911314985
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PWR",
+        "x": 18.908045977011493,
+        "y": 37.23241590214067
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 31.264367816091955,
+        "y": 37.15596330275229
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INTLK",
+        "x": 37.47126436781609,
+        "y": 37.15596330275229
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LOCK",
+        "x": 43.735632183908045,
+        "y": 37.15596330275229
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VALVE",
+        "x": 49.770114942528735,
+        "y": 37.15596330275229
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 62.12643678160919,
+        "y": 37.23241590214067
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "B",
+        "x": 2.586206896551724,
+        "y": 39.678899082568805
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 6.494252873563218,
+        "y": 41.74311926605505
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 12.643678160919542,
+        "y": 41.81957186544342
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "21",
+        "x": 18.79310344827586,
+        "y": 41.896024464831804
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 31.264367816091955,
+        "y": 41.74311926605505
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 37.47126436781609,
+        "y": 41.74311926605505
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 43.67816091954023,
+        "y": 41.66666666666667
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2Y",
+        "x": 49.82758620689655,
+        "y": 41.896024464831804
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BCZDCC7838",
+        "x": 61.724137931034484,
+        "y": 48.47094801223242
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VOICE",
+        "x": 43.85057471264368,
+        "y": 51.452599388379205
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FLIGHT RECORDER",
+        "x": 55.91954022988506,
+        "y": 51.37614678899083
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RCDR",
+        "x": 43.85057471264368,
+        "y": 52.752293577981646
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "'POSITION",
+        "x": 49.94252873563219,
+        "y": 52.752293577981646
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RELAY",
+        "x": 43.79310344827586,
+        "y": 53.899082568807344
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SENSOR",
+        "x": 49.94252873563219,
+        "y": 53.97553516819572
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 56.03448275862068,
+        "y": 53.97553516819572
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 62.29885057471264,
+        "y": 53.899082568807344
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27)",
+        "x": 43.79310344827586,
+        "y": 58.63914373088684
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 49.94252873563219,
+        "y": 58.56269113149847
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 56.20689655172414,
+        "y": 58.40978593272171
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 62.356321839080465,
+        "y": 58.56269113149847
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DISPLAY",
+        "x": 16.034482758620687,
+        "y": 65.97859327217125
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INOP",
+        "x": 37.35632183908046,
+        "y": 66.36085626911316
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "COMMUNICATIONS",
+        "x": 81.32183908045977,
+        "y": 65.97859327217125
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MCZZDCC2829",
+        "x": 92.64367816091954,
+        "y": 65.51987767584097
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CAPT",
+        "x": 6.379310344827586,
+        "y": 66.97247706422019
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MULTI",
+        "x": 12.643678160919542,
+        "y": 67.81345565749236
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VOICE",
+        "x": 37.75862068965517,
+        "y": 67.66055045871559
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EFIS",
+        "x": 6.321839080459771,
+        "y": 68.11926605504587
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 6.436781609195402,
+        "y": 69.41896024464832
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FUNCTION",
+        "x": 12.758620689655173,
+        "y": 69.34250764525994
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 18.735632183908045,
+        "y": 69.18960244648318
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 24.942528735632184,
+        "y": 69.03669724770643
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DPC 1",
+        "x": 31.379310344827587,
+        "y": 69.18960244648318
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RCDR/",
+        "x": 37.75862068965517,
+        "y": 69.1131498470948
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VOICE",
+        "x": 43.79310344827586,
+        "y": 69.41896024464832
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ISFD",
+        "x": 49.712643678160916,
+        "y": 69.80122324159022
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PANEL",
+        "x": 6.321839080459771,
+        "y": 70.64220183486239
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PANEL",
+        "x": 12.586206896551724,
+        "y": 70.87155963302753
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INBD",
+        "x": 18.850574712643677,
+        "y": 70.71865443425077
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "OTBD",
+        "x": 25.229885057471265,
+        "y": 70.565749235474
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PRI",
+        "x": 31.264367816091955,
+        "y": 70.71865443425077
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIPS",
+        "x": 37.64367816091954,
+        "y": 70.71865443425077
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RCDR",
+        "x": 43.79310344827586,
+        "y": 70.565749235474
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VHF 1",
+        "x": 68.39080459770115,
+        "y": 70.71865443425077
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VHF 3",
+        "x": 74.48275862068967,
+        "y": 70.71865443425077
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SELCAL",
+        "x": 93.16091954022988,
+        "y": 70.64220183486239
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 6.379310344827586,
+        "y": 75.53516819571865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 43.62068965517241,
+        "y": 75.61162079510704
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "10",
+        "x": 68.39080459770115,
+        "y": 75.53516819571865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "IO",
+        "x": 74.59770114942529,
+        "y": 75.53516819571865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MC27DCC2828",
+        "x": 92.93103448275862,
+        "y": 82.41590214067278
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "'SMYD-]",
+        "x": 34.6551724137931,
+        "y": 83.63914373088684
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "STALL",
+        "x": 43.79310344827586,
+        "y": 83.56269113149847
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "COMMUNICATIONS",
+        "x": 80.91954022988506,
+        "y": 82.87461773700305
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MACH",
+        "x": 18.735632183908045,
+        "y": 84.78593272171254
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "STICK",
+        "x": 25.057471264367813,
+        "y": 84.78593272171254
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SNSR",
+        "x": 37.41379310344828,
+        "y": 84.86238532110092
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WARN",
+        "x": 43.79310344827586,
+        "y": 84.78593272171254
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ADIRU",
+        "x": 49.82758620689655,
+        "y": 84.86238532110092
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INSTR",
+        "x": 12.35632183908046,
+        "y": 86.08562691131499
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WARN",
+        "x": 18.70689655172414,
+        "y": 86.04740061162079
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SHAKER",
+        "x": 25.057471264367813,
+        "y": 86.08562691131499
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CMPTR",
+        "x": 31.03448275862069,
+        "y": 86.08562691131499
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXC",
+        "x": 37.35632183908046,
+        "y": 86.16207951070336
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ASYM",
+        "x": 43.62068965517241,
+        "y": 86.0091743119266
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 49.82758620689655,
+        "y": 86.16207951070336
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "XFR",
+        "x": 12.35632183908046,
+        "y": 87.30886850152905
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SYS-1",
+        "x": 18.67816091954023,
+        "y": 87.38532110091744
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 25.057471264367813,
+        "y": 87.30886850152905
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC",
+        "x": 31.03448275862069,
+        "y": 87.38532110091744
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC",
+        "x": 37.41379310344828,
+        "y": 87.38532110091744
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MODE",
+        "x": 43.79310344827586,
+        "y": 87.30886850152905
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXC",
+        "x": 49.82758620689655,
+        "y": 87.30886850152905
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HF 1",
+        "x": 68.5632183908046,
+        "y": 87.46177370030581
+    ,
+      "cb": "",
+      "location": ""
+    },
+{
+            "text": "UAID",
+            "x": 55.97701149425287,
+            "y": 87.46177370030581,
+      "cb": "",
+      "location": ""
+    },
+
+{
+            "text": "EFB 1",
+            "x": 74.58275862068967,
+            "y": 87.46177370030581,
+      "cb": "",
+      "location": ""
+    },
+
+        {
+            "text": "5",
+        "x": 12.528735632183906,
+        "y": 91.89602446483181
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "3",
+        "x": 18.79310344827586,
+        "y": 91.89602446483181
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 25.057471264367813,
+        "y": 92.04892966360856
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "5",
+        "x": 31.14942528735632,
+        "y": 92.20183486238533
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 37.41379310344828,
+        "y": 92.2782874617737
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 43.62068965517241,
+        "y": 92.2782874617737
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "P18-2",
+        "x": 2.2988505747126435,
+        "y": 94.95412844036697
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2",
+        "x": 13.10344827586207,
+        "y": 97.85932721712538
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "10",
+        "x": 62.01149425287357,
+        "y": 97.78287461773701
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "11",
+        "x": 68.39080459770115,
+        "y": 97.78287461773701
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "12",
+        "x": 74.48275862068967,
+        "y": 97.78287461773701
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "13",
+        "x": 80.74712643678161,
+        "y": 97.78287461773701
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "14 BAC27DCCZ740 15",
+        "x": 90.05747126436782,
+        "y": 97.78287461773701,
+      "cb": "",
+      "location": ""
+    }
+] ,
+    "p18_3MAX":[
+    {
+        "text": "AAC?7OCC7879",
+        "x": 5.014409221902017,
+        "y": 7.9966329966329965
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI-ICE",
+        "x": 13.0835734870317,
+        "y": 8.333333333333332
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "& RAIN",
+        "x": 23.054755043227665,
+        "y": 8.417508417508419
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASSENGER CABIN",
+        "x": 47.83861671469741,
+        "y": 8.333333333333332
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXTERIOR",
+        "x": 65.76368876080691,
+        "y": 8.333333333333332
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BACZZLCC2829",
+        "x": 75.04322766570604,
+        "y": 9.090909090909092
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EQUIPMENT",
+        "x": 83.22766570605188,
+        "y": 8.164983164983166
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGINE",
+        "x": 32.27665706051873,
+        "y": 10.353535353535353
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LIGHTING",
+        "x": 65.6772334293948,
+        "y": 9.764309764309765
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "COOLING",
+        "x": 83.342939481268,
+        "y": 9.764309764309765
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANINCE",
+        "x": 5.014409221902017,
+        "y": 12.037037037037036
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG",
+        "x": 29.567723342939484,
+        "y": 11.952861952861953
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INE",
+        "x": 31.296829971181555,
+        "y": 11.531986531986533
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "\"EIA5\"'",
+        "x": 35.331412103746395,
+        "y": 12.037037037037036
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EASS",
+        "x": 40.518731988472624,
+        "y": 12.121212121212121
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CREW",
+        "x": 45.70605187319885,
+        "y": 12.710437710437711
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXGHTNGR",
+        "x": 53.14121037463977,
+        "y": 12.037037037037036
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "POSITION",
+        "x": 63.170028818443804,
+        "y": 12.626262626262626
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WING",
+        "x": 70.95100864553314,
+        "y": 12.542087542087543
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LOGO",
+        "x": 75.96541786743516,
+        "y": 12.626262626262626
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LOW",
+        "x": 87.1757925072046,
+        "y": 11.531986531986533
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VALVE",
+        "x": 5.014409221902017,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONIR8L",
+        "x": 30.37463976945245,
+        "y": 13.131313131313133
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 40.518731988472624,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CALL",
+        "x": 45.70605187319885,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LAFT",
+        "x": 50.60518731988473,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FWD",
+        "x": 55.792507204610956,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 60.80691642651297,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 65.87896253602305,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SCAN",
+        "x": 71.00864553314122,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ILLUM",
+        "x": 75.96541786743516,
+        "y": 13.636363636363635
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SUPPL",
+        "x": 85.93659942363112,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXHAUST",
+        "x": 90.95100864553314,
+        "y": 13.720538720538721
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 30.201729106628246,
+        "y": 17.929292929292927
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 35.44668587896253,
+        "y": 17.76094276094276
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 45.53314121037464,
+        "y": 17.929292929292927
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 71.00864553314122,
+        "y": 17.929292929292927
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27)",
+        "x": 76.25360230547551,
+        "y": 18.013468013468014
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 86.22478386167147,
+        "y": 17.929292929292927
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 91.46974063400576,
+        "y": 18.013468013468014
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI-ICE & RAIN",
+        "x": 14.178674351585013,
+        "y": 24.747474747474747
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASSENGER CABIN",
+        "x": 47.60806916426513,
+        "y": 24.66329966329966
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXTERIOR LIGHTING",
+        "x": 68.53025936599424,
+        "y": 24.66329966329966
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BA(Z70CC2029",
+        "x": 94.98559077809799,
+        "y": 24.410774410774412
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WSHLD",
+        "x": 4.84149855907781,
+        "y": 26.767676767676768
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WING",
+        "x": 9.452449567723344,
+        "y": 26.430976430976433
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WING",
+        "x": 20.0,
+        "y": 26.262626262626267
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGINE",
+        "x": 32.44956772334294,
+        "y": 25.673400673400675
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "COWL",
+        "x": 35.331412103746395,
+        "y": 26.262626262626267
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASS",
+        "x": 40.57636887608069,
+        "y": 26.851851851851855
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LIGHTING",
+        "x": 53.0835734870317,
+        "y": 26.851851851851855
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI",
+        "x": 63.68876080691642,
+        "y": 26.851851851851855
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 4.899135446685879,
+        "y": 28.535353535353536
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI-ICE",
+        "x": 9.913544668587896,
+        "y": 27.77777777777778
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WSFIR",
+        "x": 15.043227665706052,
+        "y": 27.27272727272727
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI-ICE",
+        "x": 19.94236311239193,
+        "y": 27.693602693602692
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AWALVGE",
+        "x": 35.389048991354464,
+        "y": 28.45117845117845
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RICHT",
+        "x": 40.57636887608069,
+        "y": 28.535353535353536
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AMVER CHGR-",
+        "x": 53.02593659942363,
+        "y": 28.367003367003367
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "COILISION",
+        "x": 63.51585014409223,
+        "y": 27.77777777777778
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LTRL",
+        "x": 70.54755043227667,
+        "y": 27.525252525252526
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LTRL",
+        "x": 76.19596541786744,
+        "y": 27.356902356902356
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CARGO FIRE",
+        "x": 83.80403458213257,
+        "y": 27.86195286195286
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VALVE L",
+        "x": 9.740634005763688,
+        "y": 29.292929292929294
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "\"LEFT",
+        "x": 14.956772334293946,
+        "y": 28.872053872053872
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VALVE R",
+        "x": 20.05763688760807,
+        "y": 29.124579124579125
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RED",
+        "x": 60.7492795389049,
+        "y": 29.040404040404038
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 70.89337175792507,
+        "y": 29.124579124579125
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 76.19596541786744,
+        "y": 29.040404040404038
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXT 2",
+        "x": 81.21037463976946,
+        "y": 29.040404040404038
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXT",
+        "x": 85.93659942363112,
+        "y": 29.040404040404038
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 35.389048991354464,
+        "y": 33.24915824915825
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASSENGER CABIN SIGNS",
+        "x": 48.357348703170025,
+        "y": 40.31986531986532
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXTERIOR LIGHTING",
+        "x": 65.76368876080691,
+        "y": 39.98316498316498
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MCITDCC7H7D",
+        "x": 75.04322766570604,
+        "y": 39.64646464646464
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CARGO FIRE",
+        "x": 87.26224783861672,
+        "y": 39.98316498316498
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HEATERS",
+        "x": 12.795389048991353,
+        "y": 40.99326599326599
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEV",
+        "x": 20.11527377521614,
+        "y": 42.17171717171717
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28YAC",
+        "x": 25.18731988472622,
+        "y": 41.582491582491585
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FASTEN",
+        "x": 43.170028818443804,
+        "y": 42.17171717171717
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "[ ANTI COLLISION",
+        "x": 61.90201729106628,
+        "y": 42.255892255892256
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING",
+        "x": 73.48703170028818,
+        "y": 42.003367003367
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PITOT",
+        "x": 4.84149855907781,
+        "y": 43.77104377104377
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TEMP",
+        "x": 9.913544668587896,
+        "y": 43.18181818181818
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "J#",
+        "x": 14.927953890489915,
+        "y": 43.013468013468014
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PITOT",
+        "x": 20.05763688760807,
+        "y": 43.18181818181818
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BUS",
+        "x": 24.84149855907781,
+        "y": 43.26599326599327
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SEAT BELT ",
+        "x": 43.112391930835734,
+        "y": 43.22390572390572
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NO SMOKING",
+        "x": 53.25648414985591,
+        "y": 43.18181818181818
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TAIL",
+        "x": 60.05763688760807,
+        "y": 43.51851851851852
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WINGLET",
+        "x": 65.82132564841498,
+        "y": 43.686868686868685
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RISE",
+        "x": 71.00864553314122,
+        "y": 43.85521885521885
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "REFR",
+        "x": 76.19596541786744,
+        "y": 43.85521885521885
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FORWARD",
+        "x": 83.97694524495677,
+        "y": 43.26599326599327
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFT",
+        "x": 93.94812680115274,
+        "y": 43.35016835016835
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PROBE",
+        "x": 9.855907780979827,
+        "y": 44.27609427609428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 20.05763688760807,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SECI 2",
+        "x": 25.24495677233429,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 40.461095100864554,
+        "y": 44.27609427609428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 45.47550432276657,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 50.60518731988473,
+        "y": 44.27609427609428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 55.67723342939481,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONE",
+        "x": 60.23054755043228,
+        "y": 44.612794612794616
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DET B",
+        "x": 81.15273775216139,
+        "y": 44.27609427609428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DEI A",
+        "x": 86.22478386167147,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DET B",
+        "x": 91.35446685878964,
+        "y": 44.36026936026936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DET A",
+        "x": 96.42651296829972,
+        "y": 44.27609427609428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2Y)",
+        "x": 4.899135446685879,
+        "y": 48.65319865319865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27",
+        "x": 20.11527377521614,
+        "y": 48.65319865319865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "10",
+        "x": 25.12968299711816,
+        "y": 48.484848484848484
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "27}",
+        "x": 81.21037463976946,
+        "y": 48.65319865319865
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 86.22478386167147,
+        "y": 48.569023569023564
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2Y",
+        "x": 91.35446685878964,
+        "y": 48.569023569023564
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "21",
+        "x": 96.48414985590779,
+        "y": 48.569023569023564
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASENGER CABIN SIGNS",
+        "x": 45.47550432276657,
+        "y": 55.13468013468014
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXT LIGHTING",
+        "x": 65.24495677233429,
+        "y": 55.13468013468014
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MCZ7DCC2O29",
+        "x": 95.21613832853026,
+        "y": 54.882154882154886
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HEATERS",
+        "x": 22.76657060518732,
+        "y": 56.060606060606055
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NITROGEN",
+        "x": 86.45533141210375,
+        "y": 55.97643097643098
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PROBE",
+        "x": 42.53602305475505,
+        "y": 56.73400673400673
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NGH",
+        "x": 14.985590778097983,
+        "y": 58.333333333333336
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEV",
+        "x": 20.11527377521614,
+        "y": 57.32323232323232
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FO",
+        "x": 25.302593659942364,
+        "y": 58.333333333333336
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUX",
+        "x": 30.43227665706052,
+        "y": 58.333333333333336
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUTO HEAT",
+        "x": 42.59365994236311,
+        "y": 58.080808080808076
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SUCUQE",
+        "x": 50.54755043227666,
+        "y": 57.91245791245792
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BICSS",
+        "x": 55.792507204610956,
+        "y": 57.91245791245792
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SESA\"",
+        "x": 60.97982708933718,
+        "y": 58.417508417508415
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GEN",
+        "x": 86.28242074927954,
+        "y": 57.65993265993266
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WIASTNE",
+        "x": 91.18155619596541,
+        "y": 57.82828282828283
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LINE",
+        "x": 92.39193083573487,
+        "y": 58.5016835016835
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RISQF",
+        "x": 20.11527377521614,
+        "y": 59.00673400673401
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PITOT",
+        "x": 25.24495677233429,
+        "y": 59.34343434343434
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PITOT",
+        "x": 30.37463976945245,
+        "y": 59.34343434343434
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CAPT",
+        "x": 40.57636887608069,
+        "y": 59.51178451178451
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FLO",
+        "x": 45.53314121037464,
+        "y": 59.25925925925925
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SIGN",
+        "x": 50.54755043227666,
+        "y": 59.51178451178451
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 55.792507204610956,
+        "y": 59.68013468013468
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 86.34005763688761,
+        "y": 59.34343434343434
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HEATERS",
+        "x": 91.29682997118155,
+        "y": 59.51178451178451
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "VAGUUM",
+        "x": 96.48414985590779,
+        "y": 59.00673400673401
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K",
+        "x": 20.11527377521614,
+        "y": 63.97306397306397
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%}",
+        "x": 25.18731988472622,
+        "y": 63.804713804713806
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%)",
+        "x": 30.37463976945245,
+        "y": 63.804713804713806
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%}",
+        "x": 55.73487031700288,
+        "y": 63.804713804713806
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2%",
+        "x": 96.48414985590779,
+        "y": 63.804713804713806
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RADTLLCH}",
+        "x": 75.96541786743516,
+        "y": 70.2020202020202
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AIR CONDITIONING",
+        "x": 42.82420749279539,
+        "y": 70.62289562289563
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DOOR",
+        "x": 55.792507204610956,
+        "y": 71.46464646464646
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "NGS",
+        "x": 76.13832853025937,
+        "y": 71.88552188552188
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HEATERS",
+        "x": 20.172910662824208,
+        "y": 72.39057239057239
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RECIRC FAN",
+        "x": 40.57636887608069,
+        "y": 72.39057239057239
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DRAIN MAST",
+        "x": 18.040345821325648,
+        "y": 73.56902356902357
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CABIN AIR",
+        "x": 35.73487031700288,
+        "y": 74.24242424242425
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LEFT",
+        "x": 40.63400576368876,
+        "y": 73.73737373737373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 45.53314121037464,
+        "y": 74.07407407407408
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ARET",
+        "x": 55.73487031700288,
+        "y": 73.14814814814815
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LAVATORY LAVATORY",
+        "x": 63.51585014409223,
+        "y": 73.65319865319864
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LARTORY",
+        "x": 71.00864553314122,
+        "y": 73.14814814814815
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ALT",
+        "x": 76.02305475504323,
+        "y": 73.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HOSE",
+        "x": 91.5850144092219,
+        "y": 73.56902356902357
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GND",
+        "x": 14.927953890489915,
+        "y": 74.66329966329967
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AIR",
+        "x": 20.11527377521614,
+        "y": 74.74747474747475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DRAIN",
+        "x": 25.014409221902017,
+        "y": 74.66329966329967
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 55.73487031700288,
+        "y": 74.66329966329967
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SMOKE",
+        "x": 61.03746397694525,
+        "y": 74.74747474747475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SMOKE",
+        "x": 65.99423631123919,
+        "y": 74.74747474747475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LIGHT",
+        "x": 71.00864553314122,
+        "y": 74.83164983164983
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PWR",
+        "x": 76.25360230547551,
+        "y": 74.74747474747475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HEATERS",
+        "x": 91.52737752161383,
+        "y": 74.66329966329967
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "2K}",
+        "x": 55.73487031700288,
+        "y": 79.04040404040404
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "21}",
+        "x": 60.86455331412104,
+        "y": 79.04040404040404
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BCDCC2878",
+        "x": 94.87031700288185,
+        "y": 85.26936026936028
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "OXYGEN",
+        "x": 42.65129682997118,
+        "y": 85.6902356902357
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MAN",
+        "x": 40.461095100864554,
+        "y": 88.63636363636364
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASS",
+        "x": 45.70605187319885,
+        "y": 88.63636363636364
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WAAYATFORYER",
+        "x": 71.35446685878962,
+        "y": 87.7104377104377
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "IND",
+        "x": 35.44668587896253,
+        "y": 89.64646464646465
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONT",
+        "x": 40.518731988472624,
+        "y": 89.73063973063972
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RIGHT",
+        "x": 45.648414985590776,
+        "y": 89.64646464646465
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PESS",
+        "x": 50.6628242074928,
+        "y": 89.22558922558923
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "P18-3",
+        "x": 1.2968299711815563,
+        "y": 98.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "10",
+        "x": 50.60518731988473,
+        "y": 98.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "12",
+        "x": 60.69164265129683,
+        "y": 98.14814814814815
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "13",
+        "x": 65.93659942363112,
+        "y": 98.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "14",
+        "x": 70.95100864553314,
+        "y": 98.31649831649831
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "15",
+        "x": 76.13832853025937,
+        "y": 98.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "16",
+        "x": 81.26801152737752,
+        "y": 98.23232323232324
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "18 BAC2PDCC274G1 9",
+        "x": 93.94812680115274,
+        "y": 98.31649831649831
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "{PEECPW",
+        "x": 89.10662824207492,
+        "y": 12.163299663299663
+    }
+] ,
+    "p6_1MAX":[
+    {
+        "text": "RADIO NAVIGATION",
+        "x": 73.73563218390805,
+        "y": 11.063464837049743
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-1286",
+        "x": 95.7471264367816,
+        "y": 10.891938250428817    ,
+      "cb": "",
+      "location": "ROW_A"
+    },
+        {
+            "text": "NAV SNSR DC 2",
+        "x": 57.24137931034483,
+        "y": 13.293310463121784
+    ,
+      "cb": "C01377",
+      "location": "A10"
+    },
+        {
+            "text": "NAV CONT PNL 2",
+        "x": 84.77011494252874,
+        "y": 13.379073756432247
+    ,
+      "cb": "C01379",
+      "location": "A15"
+    },
+        {
+            "text": "RADIO ALTM 2",
+        "x": 90.17241379310344,
+        "y": 13.293310463121784
+    ,
+      "cb": "C01385",
+      "location": "A16"
+    },
+        
+        {
+            "text": "VOR 2",
+        "x": 68.2183908045977,
+        "y": 15.008576329331047
+    ,
+      "cb": "C01375",
+      "location": "A12"
+    },
+        {
+            "text": "MMR 2",
+        "x": 73.67816091954023,
+        "y": 14.493996569468267
+    ,
+      "cb": "C01480",
+      "location": "A13"
+    },
+        {
+            "text": "DME 2",
+        "x": 79.19540229885057,
+        "y": 14.493996569468267
+    ,
+      "cb": "C00192",
+      "location": "A14"
+    },
+               {
+            "text": "ADF 2",
+        "x": 95.7471264367816,
+        "y": 14.493996569468267
+    ,
+      "cb": "C01383",
+      "location": "A17"
+    },
+        {
+            "text": "BAC27DCC2866",
+        "x": 95.7471264367816,
+        "y": 25.38593481989708
+    ,
+      "cb": "",
+      "location": "ROW_B"
+    },
+        {
+            "text": "SMYD 2",
+        "x": 27.64367816091954,
+        "y": 26.41509433962264
+    ,
+      "cb": "",
+      "location": ""
+    },
+        
+        {
+            "text": "SMYD 2 COMPTR DC",
+        "x": 29.48275862068965,
+        "y": 28.90222984562607
+    ,
+      "cb": "C01206",
+      "location": "B5"
+    },
+        {
+            "text": "STICK SHAKER RIGHT",
+        "x": 35.11494252873563,
+        "y": 28.90222984562607
+    ,
+      "cb": "C01393",
+      "location": "B6"
+    },
+        {
+            "text": "MACH WARN SYS 2",
+        "x": 40.57471264367816,
+        "y": 28.30188679245283
+    ,
+      "cb": "C00549",
+      "location": "B7"
+    },
+        {
+            "text": "SMYD 2 SNSR EXC AC",
+        "x": 24.080459770114942,
+        "y": 30.10291595197255
+    ,
+      "cb": "C01207",
+      "location": "B4"
+    },
+    
+        {
+            "text": "COMMUNICATIONS",
+        "x": 19.022988505747126,
+        "y": 39.96569468267582
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENTERTAINMENT",
+        "x": 43.04597701149425,
+        "y": 39.87993138936535
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC3178",
+        "x": 95.7471264367816,
+        "y": 39.62264150943396
+    ,
+      "cb": "",
+      "location": "ROW_C"
+    },
+        {
+            "text": "ADIRU RIGHT",
+        "x": 87.47126436781609,
+        "y": 42.02401372212693
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PA SYS BAT",
+        "x": 35.0,
+        "y": 43.310463121783876
+    ,
+      "cb": "C01583",
+      "location": "C6"
+    },
+       {
+            "text": "PA TAPE RPDR AC",
+        "x": 51.5,
+        "y": 43.310463121783876
+    ,
+      "cb": "C00080",
+      "location": "C6"
+    },
+ 
+        {
+            "text": "VHF 2",
+        "x": 18.620689655172416,
+        "y": 44.339622641509436
+    ,
+      "cb": "C00166",
+      "location": "C3"
+    },
+        
+        {
+            "text": "ADIRU RIGHT AC",
+        "x": 79.13793103448276,
+        "y": 44.51114922813036
+    ,
+      "cb": "C01008",
+      "location": "C14"
+    },
+        {
+            "text": "ADIRU RIGHT EXC",
+        "x": 84.59770114942529,
+        "y": 44.51114922813036
+    ,
+      "cb": "C00426",
+      "location": "C15"
+    },
+        {
+            "text": "ADIRU RIGHT DC",
+        "x": 95.57471264367817,
+        "y": 44.51114922813036
+    ,
+      "cb": "C01010",
+      "location": "C17"
+    },
+        {
+            "text": "DISPLAY",
+        "x": 59.94252873563218,
+        "y": 58.23327615780446
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-177",
+        "x": 95.6896551724138,
+        "y": 57.97598627787307
+    ,
+      "cb": "",
+      "location": "ROW_D"
+    },
+        {
+            "text": "PA AMPL BAT",
+        "x": 23.96551724137931,
+        "y": 60.4631217838765
+    ,
+      "cb": "C00082",
+      "location": "D4"
+    },
+        {
+            "text": "DPC 2 HOLDUP",
+        "x": 51.206896551724135,
+        "y": 60.548885077186966
+    ,
+      "cb": "C04024",
+      "location": "D9"
+    },
+        {
+            "text": "DPC 1 HOLDUP",
+        "x": 56.896551724137936,
+        "y": 60.63464837049742
+    ,
+      "cb": "C04022",
+      "location": "D10"
+    },
+        {
+            "text": "DPC 2 PRI",
+        "x": 62.643678160919535,
+        "y": 60.97770154373928
+    ,
+      "cb": "C04025",
+      "location": "D11"
+    },
+        {
+            "text": "WEATHER RADAR RT",
+        "x": 73.73563218390805,
+        "y": 60.291595197255575
+    ,
+      "cb": "C00120",
+      "location": "D13"
+    },
+        {
+            "text": "FMCS 2",
+        "x": 87.41379310344828,
+        "y": 60.37735849056604
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ATC 2",
+        "x": 79.02298850574712,
+        "y": 61.57804459691252
+    ,
+      "cb": "C00188",
+      "location": "D14"
+    },
+        {
+            "text": "FMCS MCDU 2",
+        "x": 84.71264367816092,
+        "y": 61.57804459691252
+    ,
+      "cb": "C01050",
+      "location": "D15"
+    },
+        {
+            "text": "FMCS CMPTR 2",
+        "x": 90.11494252873563,
+        "y": 61.492281303602056
+    ,
+      "cb": "C01262",
+      "location": "D16"
+    },
+        {
+            "text": "HF 2",
+        "x": 12.931034482758621,
+        "y": 62.692967409948544
+    ,
+      "cb": "C00857",
+      "location": "D2"
+    },
+        {
+            "text": "DISPLAY",
+        "x": 65.3448275862069,
+        "y": 77.61578044596914
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-200",
+        "x": 95.6896551724138,
+        "y": 77.70154373927959
+    ,
+      "cb": "",
+      "location": "ROW_E"
+    },
+        
+        {
+            "text": "MAINT/BITE PANEL",
+        "x": 68.44827586206897,
+        "y": 79.58833619210978
+    ,
+      "cb": "C04002",
+      "location": "E12"
+    },
+        {
+            "text": "F/O EFIS CONT PANEL",
+        "x": 73.62068965517241,
+        "y": 79.93138936535163
+    ,
+      "cb": "C04031",
+      "location": "E13"
+    },
+        {
+            "text": "ATC ANT SWITCH",
+        "x": 79.19540229885057,
+        "y": 80.0171526586621
+    ,
+      "cb": "C01194",
+      "location": "E14"
+    },
+        {
+            "text": "CMU 1 AC",
+        "x": 46.49425287356322,
+        "y": 81.38936535162951
+    ,
+      "cb": "C01483",
+      "location": "E8"
+    },
+        {
+            "text": "ACARS/CMU DC (INOP)",
+        "x": 51.839080459770116,
+        "y": 81.21783876500858
+    ,
+      "cb": "C01500",
+      "location": "E9"
+    },
+        {
+            "text": "RIGHT OUTBD DU",
+        "x": 56.839080459770116,
+        "y": 80.7032590051458
+    ,
+      "cb": "C04029",
+      "location": "E10"
+    },
+        {
+            "text": "RIGHT INBD DU",
+        "x": 62.643678160919535,
+        "y": 80.53173241852487
+    ,
+      "cb": "C04028",
+      "location": "E11"
+    },
+        {
+            "text": "PRINTER (INOP)",
+        "x": 29.770114942528735,
+        "y": 81.73241852487135
+    ,
+      "cb": "C01216",
+      "location": "E5"
+    },
+        {
+            "text": "FMCS XFR",
+        "x": 84.71264367816092,
+        "y": 81.81818181818183
+    ,
+      "cb": "C01263",
+      "location": "E15"
+    },
+{
+            "text": "EFB 2",
+            "x": 23.96551724137931,
+            "y": 81.90394511149228,
+      "cb": "",
+      "location": "E4"
+    },
+        {
+            "text": "BAC27DCC2719",
+        "x": 93.10344827586206,
+        "y": 94.08233276157804
+    ,
+      "cb": "",
+      "location": "ROW_E"
+    },
+        {
+            "text": "P6-1",
+        "x": 95.22988505747126,
+        "y": 97.08404802744425
+    }
+],
+    "p6_5MAX":[
+    {
+        "text": "EQPT COOL SMOKE DET SUPPLY",
+        "x": 46.221804511278194,
+        "y": 9.572490706319703
+    ,
+      "cb": "C04014",
+      "location": "A11"
+    },
+       
+        {
+            "text": "APU INLET DOOR",
+        "x": 50.09398496240601,
+        "y": 10.90458488228005
+    ,
+      "cb": "C04011",
+      "location": "A12"
+    },
+       
+        {
+            "text": "WINDOW HEAT POWER",
+        "x": 33.45864661654135,
+        "y": 24.380421313506815
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CABIN UTIL RLY PWR",
+        "x": 71.03383458646616,
+        "y": 24.87608426270136
+    ,
+      "cb": "C01627",
+      "location": "B17"
+    },
+        {
+            "text": "CABIN EMER LIGHTS",
+        "x": 75.15037593984962,
+        "y": 24.752168525402727
+    ,
+      "cb": "C01949",
+      "location": "B18"
+    },
+        {
+            "text": "WINDOW HEAT POWER",
+        "x": 83.59022556390977,
+        "y": 24.25650557620818
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "WINDOW HEAT POWER RIGHT FRONT",
+        "x": 33.308270676691734,
+        "y": 26.425030978934327
+    ,
+      "cb": "C00394",
+      "location": "B8"
+    },
+        {
+            "text": "WINDOW HEAT POWER LEFT SIDE",
+        "x": 37.650375939849624,
+        "y": 26.239157372986373
+    ,
+      "cb": "C00392",
+      "location": "B9"
+    },
+        {
+            "text": "WINDOW HEAT POWER RIGHT SIDE",
+        "x": 83.45864661654136,
+        "y": 26.11524163568773
+    ,
+      "cb": "C00393",
+      "location": "B20"
+    },
+        {
+            "text": "WINDOW HEAT POWER LEFT FRONT",
+        "x": 87.76315789473685,
+        "y": 26.11524163568773
+    ,
+      "cb": "C00228",
+      "location": "B21"
+    },
+        {
+            "text": "SPOILER CONTROL ELEC PWR A",
+        "x": 41.72932330827068,
+        "y": 37.88723667905824
+    ,
+      "cb": "C04032",
+      "location": "C10"
+    },
+        {
+            "text": "SPOILER CONTROL ELEC PWR B",
+        "x": 50.150375939849624,
+        "y": 37.88723667905824
+    ,
+      "cb": "C04033",
+      "location": "C12"
+    },
+ {
+            "text": "SURVL CAMERA",
+        "x": 4.304511278195489,
+        "y": 26.425030978934327
+    ,
+      "cb": "C01641",
+      "location": "B1"
+    },
+
+        {
+            "text": "NETWORK FILE SERVER",
+        "x": 4.304511278195489,
+        "y": 38.47583643122677
+    ,
+      "cb": "C01958",
+      "location": "C1"
+    },
+{
+            "text": "ONS DATALOAD RLY",
+        "x": 9.233082706766917,
+        "y": 38.47583643122677
+    ,
+      "cb": "C04067",
+      "location": "C2"
+    },
+
+        {
+            "text": "ELEC PWR",
+        "x": 41.82330827067669,
+        "y": 40.33457249070632
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTI-ICE RAIN ENG 2 CONTROL",
+        "x": 45.78947368421053,
+        "y": 51.39405204460966
+    ,
+      "cb": "C04082",
+      "location": "D11"
+    },
+        {
+            "text": "LANDING GEAR CONTROL 1",
+        "x": 74.94360902255639,
+        "y": 51.270136307311034
+    ,
+      "cb": "C04020",
+      "location": "D18"
+    },
+        {
+            "text": "LANDING GEAR CONTROL 2",
+        "x": 79.21052631578948,
+        "y": 51.270136307311034
+    ,
+      "cb": "C04021",
+      "location": "D19"
+    },
+        {
+            "text": "ENG 1 EEC FAN BLOWER",
+        "x": 8.233082706766917,
+        "y": 52.32342007434945
+    ,
+      "cb": "C04049",
+      "location": "D2"
+    },
+        {
+            "text": "ENG 2 EEC FAN BLOWER",
+        "x": 20.99624060150376,
+        "y": 52.57125154894672
+    ,
+      "cb": "C04050",
+      "location": "D5"
+    },
+        {
+            "text": "ENG 1 IGN PWR CONT",
+        "x": 3.9285714285714284,
+        "y": 65.83023543990086
+    ,
+      "cb": "C04016",
+      "location": "E1"
+    },
+        {
+            "text": "ENG 2 IGN PWR CONT",
+        "x": 8.270676691729323,
+        "y": 65.76827757125156
+    ,
+      "cb": "C04017",
+      "location": "E2"
+    },
+        {
+            "text": "ENG 1 STBY PWR",
+        "x": 14.473684210526317,
+        "y": 65.70631970260223
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 1 STBY ALTN PWR RLY CHAN A",
+        "x": 12.293233082706767,
+        "y": 66.60470879801736
+    ,
+      "cb": "C04018",
+      "location": "E3"
+    },
+        {
+            "text": "ENG 1 STBY ALTN PWR CHAN A ",
+        "x": 16.541353383458645,
+        "y": 67.44114002478315
+    ,
+      "cb": "C04019",
+      "location": "E4"
+    },
+        {
+            "text": "ELEX PANEL LIGHTING",
+        "x": 13.684210526315791,
+        "y": 79.21313506815365
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "IASC EAI INHIBITS OUT",
+        "x": 27.706766917293237,
+        "y": 79.21313506815365
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEX PANEL LIGHTING SEC 1",
+        "x": 4.19172932330827,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04044",
+      "location": "F1"
+    },
+        {
+            "text": "ELEX PANEL LIGHTING SEC 2",
+        "x": 8.533834586466165,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04045",
+      "location": "F2"
+    },
+        {
+            "text": "ELEX PANEL LIGHTING SEC 3",
+        "x": 12.725563909774436,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04046",
+      "location": "F3"
+    },
+        {
+            "text": "ELEX PANEL LIGHTING SEC 4",
+        "x": 16.74812030075188,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04047",
+      "location": "F4"
+    },
+        {
+            "text": "ELEX PANEL LIGHTING SEC 5",
+        "x": 21.071428571428573,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04048",
+      "location": "F5"
+    },
+{
+            "text": "IASC EAI INHIBITS OUT L",
+        "x": 25.071428571428573,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04065",
+      "location": "F6"
+    },
+{
+            "text": "IASC EAI INHIBITS OUT R",
+        "x": 30.071428571428573,
+        "y": 82.43494423791822
+    ,
+      "cb": "C04066",
+      "location": "F7"
+    },
+        {
+            "text": "P6-5",
+        "x": 92.04887218045113,
+        "y": 96.93308550185874,
+      "cb": "",
+      "location": ""},
+{
+            "text": "233A5116-1008",
+        "x": 87.76315789473685,
+        "y": 10.11524163568773,
+      "cb": "",
+      "location": "ROW_A"},
+{
+            "text": "233A5116-1333",
+        "x": 87.76315789473685,
+        "y": 23.11524163568773,
+      "cb": "",
+      "location": "ROW_B"},
+{
+            "text": "233A5116-1087",
+        "x": 87.76315789473685,
+        "y": 38.11524163568773,
+      "cb": "",
+      "location": "ROW_C"},
+{
+            "text": "233A5116-1102",
+        "x": 87.76315789473685,
+        "y": 51.11524163568773,
+      "cb": "",
+      "location": "ROW_D"},
+{
+            "text": "233A5116-1140",
+        "x": 87.76315789473685,
+        "y": 65.11524163568773,
+      "cb": "",
+      "location": "ROW_E"},
+{
+            "text": "233A5116-1097",
+        "x": 87.76315789473685,
+        "y": 80.11524163568773,
+      "cb": "",
+      "location": "ROW_F"},
+{
+            "text": "BAC27DCCXXXX",
+        "x": 85.76315789473685,
+        "y": 94.11524163568773,
+      "cb": "",
+      "location": "ROW_NUMBER"
+    }
+],
+
+//BURDAN DEVAM
+    "p6_2MAX":[
+    {
+        "text": "FLIGHT CONTROL",
+        "x": 37.43500866551127,
+        "y": 12.797992471769135
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HYDRAULIC SYSTEM",
+        "x": 63.084922010398614,
+        "y": 12.73525721455458
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FIRE PROTECTION",
+        "x": 87.69497400346621,
+        "y": 12.797992471769135
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-209",
+        "x": 96.93818601964182,
+        "y": 13.048933500627353
+    ,
+      "cb": "",
+      "location": "ROW_A"
+    },
+        {
+            "text": "AFCS INTLK 2",
+        "x": 12.767186597342576,
+        "y": 16.06022584692597
+    ,
+      "cb": "",
+      "location": "A3"
+    },
+        {
+            "text": "FLAP LOAD RELIEF",
+        "x": 24.783362218370883,
+        "y": 15.558343789209536
+    ,
+      "cb": "",
+      "location": "A6"
+    },
+        {
+            "text": "FLAP SHUTOFF VALVES",
+        "x": 28.827267475447716,
+        "y": 15.683814303638647
+    ,
+      "cb": "",
+      "location": "A7"
+    },
+        {
+            "text": "TE FLAP POS/SKEW SNSR & IND",
+        "x": 46.96707105719237,
+        "y": 15.683814303638647
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BRAKE PRESSURE IND",
+        "x": 53.03292894280762,
+        "y": 15.683814303638647
+    ,
+      "cb": "",
+      "location": "A13"
+    },
+        {
+            "text": "ENG PUMP DEPRESS VALVE 2",
+        "x": 69.38186019641826,
+        "y": 15.809284818067754
+    ,
+      "cb": "",
+      "location": "A17"
+    },
+        {
+            "text": "FIRE DETECTION",
+        "x": 91.85441941074524,
+        "y": 15.809284818067754
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FSEU",
+        "x": 34.95089543616407,
+        "y": 17.063989962358846
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FSEU DC 2",
+        "x": 36.97284806470248,
+        "y": 18.318695106649937
+    ,
+      "cb": "",
+      "location": "A9"
+    },
+{
+            "text": "FSEU DC 1",
+        "x": 32.97284806470248,
+        "y": 18.318695106649937
+    ,
+      "cb": "",
+      "location": "A8"
+    },
+        {
+            "text": "TE FLAP POS/SKEW SNSR & IND RIGHT",
+        "x": 44.945118428653956,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": "A11"
+    },
+
+        {
+            "text": "TE FLAP POS/SKEW SNSR & IND LEFT",
+        "x": 48.945118428653956,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": "A12"
+    },
+        {
+            "text": "PTU VALVE",
+        "x": 63.200462160600814,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": ""
+    },
+       
+        {
+            "text": "PTU VALVE CONT 1",
+        "x": 61.200462160600814,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": "A15"
+    },{
+            "text": "PTU VALVE CONT 2",
+        "x": 65.200462160600814,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": "A16"
+    },
+        {
+            "text": "OVHT WW WING BODY",
+        "x": 77.52744078567302,
+        "y": 16.938519447929735
+    ,
+      "cb": "",
+      "location": "A19"
+    },
+        {
+            "text": "MA WRN & CONT",
+        "x": 85.96187175043327,
+        "y": 17.565872020075282
+    ,
+      "cb": "",
+      "location": "A21"
+    },
+        {
+            "text": "FIRE DETECTION ENG 2",
+        "x": 89.65915655690353,
+        "y": 18.444165621079048
+    ,
+      "cb": "",
+      "location": "A22"
+    },
+        {
+            "text": "FIRE DETECTION APU",
+        "x": 93.52975158867707,
+        "y": 18.569636135508155
+    ,
+      "cb": "",
+      "location": "A23"
+    },
+        {
+            "text": "FIRE DETECTION ENG 1",
+        "x": 97.4581166955517,
+        "y": 18.444165621079048
+    ,
+      "cb": "",
+      "location": "A24"
+    },
+        {
+            "text": "AFCS SYS B",
+        "x": 10.398613518197573,
+        "y": 33.626097867001256
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FLIGHT CONTROL",
+        "x": 46.3893703061814,
+        "y": 33.24968632371393
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HYDRAULIC SYSTEM",
+        "x": 69.32409012131716,
+        "y": 33.24968632371393
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FIRE PROTECTION",
+        "x": 89.31253610629693,
+        "y": 32.99874529485571
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-211",
+        "x": 96.93818601964182,
+        "y": 33.12421580928482
+    ,
+      "cb": "",
+      "location": "ROW_B"
+    },
+
+        {
+            "text": "ENG START LEVER",
+        "x": 24.783362218370883,
+        "y": 34.88080301129234
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEV TAB VLV RIGHT",
+        "x": 32.755632582322356,
+        "y": 35.75909661229611
+    ,
+      "cb": "",
+      "location": "B8"
+    },
+        {
+            "text": "AUTO SPEED BRAKE",
+        "x": 36.79953783939919,
+        "y": 35.88456712672522
+    ,
+      "cb": "",
+      "location": "B9"
+    },
+        {
+            "text": "STAB TRIM CONT",
+        "x": 40.90121317157712,
+        "y": 35.88456712672522
+    ,
+      "cb": "",
+      "location": "B10"
+    },
+        {
+            "text": "GROUND SPOILER CONT",
+        "x": 45.00288850375506,
+        "y": 35.257214554579676
+    ,
+      "cb": "",
+      "location": "B11"
+    },
+        {
+            "text": "FLIGHT CONTROL SHUTOFF VALVES",
+        "x": 51.64644714038128,
+        "y": 35.75909661229611
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "APU FIRE SW POWER",
+        "x": 77.46967071057192,
+        "y": 35.75909661229611
+    ,
+      "cb": "",
+      "location": "B19"
+    },
+        {
+            "text": "FIRE EXTINGUISHERS",
+        "x": 89.65915655690353,
+        "y": 35.5081555834379
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS SYS B WARN LIGHT (BAT)",
+        "x": 4.217215482380127,
+        "y": 36.38644918444165
+    ,
+      "cb": "",
+      "location": "B1"
+    },
+        {
+            "text": "AFCS SYS B MACH TRIM DC",
+       "x": 8.31889081455806,
+        "y": 36.19824341279799
+    ,
+      "cb": "",
+      "location": "B2"
+    },
+        {
+            "text": "AFCS SYS B FCC DC",
+        "x": 12.478336221837088,
+        "y": 37.76662484316186
+    ,
+      "cb": "",
+      "location": "B3"
+    },
+        {
+            "text": "AFCS SYS B ENGAGE INTLK",
+        "x": 16.34893125361063,
+        "y": 37.39021329987453
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 RUN/PWR",
+        "x": 20.50837666088966,
+        "y": 37.51568381430364
+    ,
+      "cb": "",
+      "location": "B5"
+    },
+        {
+            "text": "ENG 2 START LEVER CHAN A",
+        "x": 24.610051993067593,
+        "y": 37.0138017565872
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEV TAB VLV RIGHT",
+        "x": 32.92894280762565,
+        "y": 37.641154328732746
+    ,
+      "cb": "",
+      "location": "B8"
+    },
+        {
+            "text": "AUTO SPEED BRAKE",
+        "x": 36.79953783939919,
+        "y": 37.76662484316186
+    ,
+      "cb": "",
+      "location": "B9"
+    },
+        {
+            "text": "STAB TRIM CONT",
+        "x": 40.872328134026574,
+        "y": 37.82936010037641
+    ,
+      "cb": "",
+      "location": "B10"
+    },
+        {
+            "text": "GROUND SPOILER CONTROL",
+        "x": 44.82957827845176,
+        "y": 37.641154328732746
+    ,
+      "cb": "",
+      "location": "B11"
+    },
+        {
+            "text": "SHUTOFF VALVES SPOILER",
+        "x": 49.104563835932986,
+        "y": 38.393977415307404
+    ,
+      "cb": "",
+      "location": "B12"
+    },
+        {
+            "text": "SHUTOFF VALVES FLT CONT",
+        "x": 52.975158867706526,
+        "y": 37.641154328732746
+    ,
+      "cb": "",
+      "location": "B13"
+    },
+        {
+            "text": "AUTO SLAT DC",
+        "x": 57.019064124783355,
+        "y": 37.13927227101631
+    ,
+      "cb": "",
+      "location": "B14"
+    },
+        {
+            "text": "ENG PUMP DEPRESS VALVE 1",
+        "x": 61.40958983246678,
+        "y": 36.888331242158095
+    ,
+      "cb": "",
+      "location": "B15"
+    },
+        {
+            "text": "APU FIRE SW POWER",
+        "x": 77.35413056036973,
+        "y": 37.641154328732746
+    ,
+      "cb": "",
+      "location": "B19"
+    },
+        {
+            "text": "FIRE EXTINGUISHERS RIGHT",
+        "x": 81.51357596764875,
+        "y": 38.393977415307404
+    ,
+      "cb": "",
+      "location": "B20"
+    },
+        {
+            "text": "FIRE EXTINGUISHERS APU",
+        "x": 85.67302137492779,
+        "y": 38.393977415307404
+    ,
+      "cb": "",
+      "location": "B21"
+    },
+        {
+            "text": "FIRE EXTINGUISHERS LEFT",
+        "x": 89.60138648180242,
+        "y": 38.64491844416562
+    ,
+      "cb": "",
+      "location": "B22"
+    },
+        {
+            "text": "FIRE EXTINGUISHERS ALTN",
+        "x": 95.37839399191219,
+        "y": 37.76662484316186
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS SYS B",
+        "x": 6.296938186019642,
+        "y": 53.07402760351317
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FLIGHT CONTROL",
+        "x": 46.90930098209128,
+        "y": 52.57214554579674
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "HYDRAULIC SYSTEM",
+        "x": 69.23743500866551,
+        "y": 52.82308657465495
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-1003",
+        "x": 82.89196995956095,
+        "y": 52.57214554579674
+    ,
+      "cb": "",
+      "location": "ROW_C"
+    },
+        {
+            "text": "INTERPHONE POWER",
+        "x": 91.27671865973426,
+        "y": 52.82308657465495
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS SYS B MACH TRIM AC",
+        "x": 4.274985557481225,
+        "y": 55.70890840652447
+    ,
+      "cb": "",
+      "location": "C1"
+    },
+        {
+            "text": "ENG 2 THRUST REVERSER",
+        "x": 24.725592143269786,
+        "y": 54.45420326223338
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RUDDER AUTHOIRTY LIMITER ",
+        "x": 37.030618139803586,
+        "y": 55.70890840652447
+    ,
+      "cb": "",
+      "location": "C9"
+    },
+        {
+            "text": "SHUTOFF VALVES",
+        "x": 49.33564413633738,
+        "y": 55.20702634880803
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUTO SLAT DC 1",
+        "x": 57.134604274985556,
+        "y": 55.20702634880803
+    ,
+      "cb": "",
+      "location": "C14"
+    },
+        {
+            "text": "LDG GR SY5 XFR VALVE",
+        "x": 63.258232235701904,
+        "y": 55.081555834378925
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SHUTOF VALVES",
+        "x": 75.4477180820335,
+        "y": 55.45796737766625
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS SYS B SNSR EXC AC",
+        "x": 8.31889081455806,
+        "y": 56.46173149309912
+    ,
+      "cb": "",
+      "location": "C2"
+    },
+        {
+            "text": "MCP DC 2",
+        "x": 12.420566146735991,
+        "y": 57.08908406524466
+    ,
+      "cb": "",
+      "location": "C3"
+    },
+        {
+            "text": "ENG 2 START VALVE ",
+        "x": 16.34893125361063,
+        "y": 57.08908406524466
+    ,
+      "cb": "",
+      "location": "C4"
+    },
+        {
+            "text": "ENG 2 SYNC LOCK",
+        "x": 20.623916811091856,
+        "y": 57.08908406524466
+    ,
+      "cb": "",
+      "location": "C5"
+    },
+        {
+            "text": "STBY RUDDER",
+        "x": 45.00288850375506,
+        "y": 56.46173149309912
+    ,
+      "cb": "",
+      "location": "C11"
+    },
+        {
+            "text": "SHUTOFF VALVES FLT CONT",
+        "x": 53.03292894280762,
+        "y": 56.46173149309912
+    ,
+      "cb": "",
+      "location": "C13"
+    },
+        {
+            "text": "AUTO SLAT DC 1",
+        "x": 57.134604274985556,
+        "y": 56.46173149309912
+    ,
+      "cb": "",
+      "location": "C14"
+    },
+        {
+            "text": "LDG GR SYS XFR VALVE",
+        "x": 63.258232235701904,
+        "y": 56.2107904642409
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INTERPHONE POWER F/O",
+        "x": 87.69497400346621,
+        "y": 56.2107904642409
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INTERPHONE POWER CAPT",
+        "x": 95.89832466782207,
+        "y": 56.2107904642409
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AFCS SYS B SNSR EXC AC",
+        "x": 8.31889081455806,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C2"
+    },
+        {
+            "text": "ENG 2 THRUST REVERSER INTLK",
+        "x": 24.66782206816869,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C6"
+    },
+        {
+            "text": "ENG 2 THRUST REVERSER CONT",
+        "x": 28.827267475447716,
+        "y": 57.84190715181933
+    ,
+      "cb": "",
+      "location": "C7"
+    },
+       
+        {
+            "text": "SHUTOFF VALVES STBY RUDDER",
+        "x": 45.00288850375506,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C11"
+    },
+        {
+            "text": "SHUTOFF VALVES FLT CONT",
+        "x": 53.090699017908726,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C13"
+    },
+        {
+            "text": "LDG GR SYS XFR VALVE SEC",
+        "x": 61.23627960716349,
+        "y": 57.84190715181933
+    ,
+      "cb": "",
+      "location": "C15"
+    },
+        {
+            "text": "SHUTOFF VALVES ENG 2",
+        "x": 73.0791450028885,
+        "y": 57.84190715181933
+    ,
+      "cb": "",
+      "location": "C18"
+    },
+        {
+            "text": "SHUTOFF VALVES ENG 1",
+        "x": 77.12305025996534,
+        "y": 57.84190715181933
+    ,
+      "cb": "",
+      "location": "C19"
+    },
+        {
+            "text": "INTERPHONE POWER F/O DC 2",
+        "x": 85.67302137492779,
+        "y": 57.96737766624843
+    ,
+      "cb": "",
+      "location": "C21"
+    },
+        {
+            "text": "INTERPHONE POWER F/O BAT",
+        "x": 89.65915655690353,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C22 "
+    },
+        {
+            "text": "INTERPHONE POWER CAPT DC 2",
+        "x": 93.81860196418256,
+        "y": 57.84190715181933
+    ,
+      "cb": "",
+      "location": "C23"
+    },
+        {
+            "text": "INTERPHONE POWER CAPT BAT",
+        "x": 97.6891969959561,
+        "y": 57.71643663739021
+    ,
+      "cb": "",
+      "location": "C24"
+    },
+        {
+            "text": "OVERWING",
+        "x": 6.0369728480647025,
+        "y": 73.02383939774153
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENGINE",
+        "x": 24.090121317157713,
+        "y": 74.0276035131744
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FLIGHT CONTROL",
+        "x": 57.076834199884466,
+        "y": 73.14930991217064
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 ALTN PWR",
+        "x": 29.924898902368575,
+        "y": 75.53324968632371
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 ALTN PWR CHAN A",
+        "x": 32.40901213171577,
+        "y": 76.03513174404016
+    ,
+      "cb": "",
+      "location": "D8"
+    },
+        {
+            "text": "INTPH AND WARN",
+        "x": 85.6152512998267,
+        "y": 75.53324968632371
+    ,
+      "cb": "",
+      "location": "D21"
+    },
+        {
+            "text": "OVERWING FLIGHT LOCK",
+        "x": 6.065857885615252,
+        "y": 77.41530740276035
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 IGNITION RIGHT",
+        "x": 16.522241478913923,
+        "y": 78.04265997490589
+    ,
+      "cb": "",
+      "location": "D4"
+    },
+        {
+            "text": "ENG 2 IGNITION",
+        "x": 20.566146735990756,
+        "y": 76.78795483061481
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 IGNITION LEFT",
+        "x": 24.436741767764296,
+        "y": 78.04265997490589
+    ,
+      "cb": "",
+      "location": "D6"
+    },
+        {
+            "text": "ENG 2 ALT PWR CHAN B",
+        "x": 28.711727325245523,
+        "y": 76.78795483061481
+    ,
+      "cb": "",
+      "location": "D7"
+    },
+        {
+            "text": "STAB TRIM ACTUATOR",
+        "x": 41.01675332177932,
+        "y": 77.41530740276035
+    ,
+      "cb": "",
+      "location": "C10"
+    },
+        {
+            "text": "ALTN TE FLAP DRIVE",
+        "x": 53.20623916811091,
+        "y": 77.28983688833124
+    ,
+      "cb": "",
+      "location": "D13"
+    },
+        {
+            "text": "FORCE FIGHT MON",
+        "x": 61.23627960716349,
+        "y": 76.78795483061481
+    ,
+      "cb": "",
+      "location": "D15"
+    },
+        {
+            "text": "TRIM IND RUDDER",
+        "x": 65.16464471403813,
+        "y": 77.41530740276035
+    ,
+      "cb": "",
+      "location": "D16"
+    },
+        {
+            "text": "TRIM CONT",
+        "x": 75.33217793183131,
+        "y": 76.91342534504392
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INTPH AND WARN",
+        "x": 85.55748122472559,
+        "y": 77.28983688833124
+    ,
+      "cb": "",
+      "location": "D21"
+    },
+        {
+            "text": "AUDIO",
+        "x": 93.81860196418256,
+        "y": 77.03889585947302
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TRIM CONT RUD",
+        "x": 77.58521086077413,
+        "y": 78.29360100376411
+    ,
+      "cb": "",
+      "location": "D19"
+    },
+       
+        {
+            "text": "AUDIO F/O",
+        "x": 89.77469670710572,
+        "y": 78.29360100376411
+    ,
+      "cb": "",
+      "location": "D22"
+    },
+        {
+            "text": "AUDIO CAPT",
+        "x": 93.81860196418256,
+        "y": 78.29360100376411
+    ,
+      "cb": "",
+      "location": "D23"
+    },
+        {
+            "text": "AUDIO OBS",
+        "x": 97.80473714615829,
+        "y": 78.29360100376411
+    ,
+      "cb": "",
+      "location": "D24"
+    },
+
+        {
+            "text": "BAC27DCC3309",
+         "x": 96.89196995956095,
+        "y": 72.57214554579674
+    ,
+      "cb": "",
+      "location": "ROW_D"
+    },
+        {
+            "text": "BAC27DCC2731",
+        "x": 95.72501444251877,
+        "y": 92.47176913425345
+    ,
+      "cb": "",
+      "location": "ROW_NUMBER"
+    },
+        {
+            "text": "P6-2",
+        "x": 96.36048526863085,
+        "y": 95.8594730238394
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 START LEVER CHAN B",
+        "x": 28.74061236279607,
+        "y": 36.95106649937265,
+      "cb": "",
+      "location": "B7"
+    }
+],
+
+    "p6_3MAX":[
+    {
+        "text": "233A5116-212",
+        "x": 78.12320092112837,
+        "y": 10.101801096319498
+    ,
+      "cb": "",
+      "location": "ROW_A"
+    },
+        {
+            "text": "FUEL",
+        "x": 27.058146229130685,
+        "y": 10.649960845732185
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "CONTROL CABIN LIGHTING",
+        "x": 60.79447322970639,
+        "y": 10.5716523101018
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING GEAR",
+        "x": 89.5797351755901,
+        "y": 10.493343774471416
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PANEL FLOOD STBY",
+        "x": 63.730569948186535,
+        "y": 12.529365700861394
+    ,
+      "cb": "",
+      "location": "A12"
+    },
+        {
+            "text": "AUTOBRAKE BITE",
+        "x": 89.7524467472654,
+        "y": 12.216131558339859
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FUELING CONT",
+        "x": 16.825561312607945,
+        "y": 13.938919342208301
+    ,
+      "cb": "",
+      "location": "A3"
+    },
+        {
+            "text": "FUEL QTY 2",
+        "x": 26.770293609671846,
+        "y": 14.487079091620986
+    ,
+      "cb": "",
+      "location": "A5"
+    },
+        {
+            "text": "TEMP INDICATOR",
+        "x": 37.65112262521589,
+        "y": 14.095536413469068
+    ,
+      "cb": "",
+      "location": "A7"
+    },
+        {
+            "text": "LIGHTING CONT STAND",
+        "x": 42.717328727691424,
+        "y": 14.095536413469068
+    ,
+      "cb": "",
+      "location": "A8"
+    },
+        {
+            "text": "LIGHTING MAP & KIT",
+        "x": 48.01381692573403,
+        "y": 14.017227877838684
+    ,
+      "cb": "",
+      "location": "A9"
+    },
+        {
+            "text": "LIGHTING OBS READING",
+        "x": 53.25273459988485,
+        "y": 14.017227877838684
+    ,
+      "cb": "",
+      "location": "A10"
+    },
+        {
+            "text": "LIGHTING PANEL FLOOD LIGHT",
+        "x": 58.43408175014393,
+        "y": 13.547376664056381
+    ,
+      "cb": "",
+      "location": "A11"
+    },
+        {
+            "text": "LIGHTING PANEL FLOOD STBY",
+        "x": 63.78814047207829,
+        "y": 14.095536413469068
+    ,
+      "cb": "",
+      "location": "A12"
+    },
+        {
+            "text": "STBY COMPASS",
+        "x": 74.26597582037996,
+        "y": 14.017227877838684
+    ,
+      "cb": "",
+      "location": "A14"
+    },
+        {
+            "text": "DOME WHITE",
+        "x": 79.44732297063904,
+        "y": 14.095536413469068
+    ,
+      "cb": "",
+      "location": "A15"
+    },
+        {
+            "text": "AUTOBRAKE BITE CONT 2",
+        "x": 84.57109959700632,
+        "y": 13.547376664056381
+    ,
+      "cb": "",
+      "location": "A16"
+    },
+        
+        {
+            "text": "AUTOBRAKE BITE CONT 1",
+        "x": 95.10650546919976,
+        "y": 13.70399373531715
+    ,
+      "cb": "",
+      "location": "A18"
+    },
+        {
+            "text": "FUEL",
+        "x": 27.11571675302245,
+        "y": 24.74549725920125
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PANEL & INSTR",
+        "x": 48.244099021301096,
+        "y": 24.823805794831635
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MASTER CAUTION",
+        "x": 65.91824985607369,
+        "y": 24.823805794831635
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING GEAR",
+        "x": 86.9314910765688,
+        "y": 24.823805794831635
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-214",
+        "x": 94.70351180195739,
+        "y": 24.74549725920125
+    ,
+      "cb": "",
+      "location": "ROW_B"
+    },
+        {
+            "text": "SPAR VALVE ENG 2",
+        "x": 16.580310880829018,
+        "y": 26.859827721221613
+    ,
+      "cb": "",
+      "location": "B3"
+    },
+        {
+            "text": "SPAR VALVE ENG 1",
+        "x": 21.761658031088082,
+        "y": 26.859827721221613
+    ,
+      "cb": "",
+      "location": "B4"
+    },
+        {
+            "text": "SPAR VALVE IND",
+        "x": 27.000575705238916,
+        "y": 26.78151918559123
+    ,
+      "cb": "",
+      "location": "B5"
+    },
+        {
+            "text": "CROSS FEED VAL IND",
+        "x": 31.951640759930918,
+        "y": 26.859827721221613
+    ,
+      "cb": "",
+      "location": "B6"
+    },
+        {
+            "text": "CROSS FEED VALVE",
+        "x": 37.42084052964882,
+        "y": 26.703210649960845
+    ,
+      "cb": "",
+      "location": "B7"
+    },
+        {
+            "text": "PANEL&INSTR 28V PRI",
+        "x": 50.374208405296486,
+        "y": 26.78151918559123
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MASTER CAUTION ANNUNCIATOR",
+        "x": 65.68796776050661,
+        "y": 27.016444792482382
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING GEAR LATCH & PRESS WARN",
+        "x": 89.9251583189407,
+        "y": 26.859827721221613
+    ,
+      "cb": "",
+      "location": "B17"
+    },
+        {
+            "text": "PANEL&INSTR 28V PRI CAPT&CTR",
+        "x": 47.95624640184226,
+        "y": 28.50430696945967
+    ,
+      "cb": "",
+      "location": "B9"
+    },
+        {
+            "text": "PANEL&INSTR 28V PRI F/O",
+        "x": 53.08002302820955,
+        "y": 28.895849647611588
+    ,
+      "cb": "",
+      "location": "B10"
+    },
+        {
+            "text": "MASTER CAUTION ANNUNCIATOR BUS 1",
+        "x": 63.270005757052395,
+        "y": 28.895849647611588
+    ,
+      "cb": "",
+      "location": "B12"
+    },
+        {
+            "text": "MASTER CAUTION ANNUNCIATOR BAT",
+        "x": 68.73920552677029,
+        "y": 28.895849647611588
+    ,
+      "cb": "",
+      "location": "B13"
+    },
+        {
+            "text": "LANDING GEAR PARKING BRAKE",
+        "x": 84.80138169257341,
+        "y": 28.50430696945967
+    ,
+      "cb": "",
+      "location": "B16"
+    },
+        {
+            "text": "AUTO S/O BST PUMP CTR TNK L DC",
+        "x": 16.753022452504318,
+        "y": 39.762725137039936
+    ,
+      "cb": "",
+      "location": "C3"
+    },
+        {
+            "text": "FUEL",
+        "x": 27.34599884858952,
+        "y": 38.84103367267032
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUTO S/O BST PUMP CTR TNK R DC",
+        "x": 37.70869314910766,
+        "y": 39.919342208300705
+    ,
+      "cb": "",
+      "location": "C7"
+    },
+        {
+            "text": "PANEL & INSTR",
+        "x": 47.84110535405872,
+        "y": 38.762725137039936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TO DISCONNECT PULL (2) BREAKERS",
+        "x": 65.94703511801957,
+        "y": 38.449490994518406
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING GEAR",
+        "x": 87.2769142199194,
+        "y": 38.762725137039936
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-1004",
+        "x": 94.58837075417387,
+        "y": 38.13625685199687
+    ,
+      "cb": "",
+      "location": "ROW_C"
+    },
+        {
+            "text": "FUEL SHUTOFF VALVES",
+        "x": 27.230857800805985,
+        "y": 41.42521534847298
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PANEL&INSTR CB PANEL",
+        "x": 47.95624640184226,
+        "y": 41.73844949099452
+    ,
+      "cb": "",
+      "location": "C9"
+    },
+        {
+            "text": "CONT 1",
+        "x": 58.43408175014393,
+        "y": 41.73844949099452
+    ,
+      "cb": "",
+      "location": "C11"
+    },
+        {
+            "text": "CONT 2",
+        "x": 63.730569948186535,
+        "y": 41.73844949099452
+    ,
+      "cb": "",
+      "location": "C12"
+    },
+        {
+            "text": "CONT 3",
+        "x": 68.85434657455383,
+        "y": 41.73844949099452
+    ,
+      "cb": "",
+      "location": "C13"
+    },
+        {
+            "text": "CONT 4",
+        "x": 74.09326424870466,
+        "y": 41.73844949099452
+    ,
+      "cb": "",
+      "location": "C14"
+    },
+        {
+            "text": "AIR/GND SYS 2",
+        "x": 79.44732297063904,
+        "y": 40.798747063429914
+    ,
+      "cb": "",
+      "location": "C15"
+    },
+        {
+            "text": "AIR/GND SYS 1",
+        "x": 84.6286701208981,
+        "y": 41.503523884103366
+    ,
+      "cb": "",
+      "location": "C16"
+    },
+        {
+            "text": "FUEL SHUTOFF VALVES PWR PACK",
+        "x": 21.81922855497985,
+        "y": 42.678151918559124
+    ,
+      "cb": "",
+      "location": "C4"
+    },
+        {
+            "text": "FUEL SHUTOFF VALVES BUS",
+        "x": 32.29706390328152,
+        "y": 42.678151918559124
+    ,
+      "cb": "",
+      "location": "C6"
+    },
+        {
+            "text": "FUEL AUTO S/O UPCO BST PMP CTR TNK L AC",
+        "x": 37.53598157743235,
+        "y": 54.189506656225525
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC3551",
+        "x": 95.45192861255038,
+        "y": 53.01487862176977
+    ,
+      "cb": "",
+      "location": "ROW_D"
+    },
+        {
+            "text": "INDICATOR",
+        "x": 65.86067933218193,
+        "y": 53.48472983555208
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "LANDING GEAR",
+        "x": 87.2769142199194,
+        "y": 53.48472983555208
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EMER PANEL LTG",
+        "x": 42.774899251583186,
+        "y": 55.52075176194206
+    ,
+      "cb": "",
+      "location": "D8"
+    },
+        {
+            "text": "OVERHEAD 28V",
+        "x": 50.77720207253886,
+        "y": 55.52075176194206
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "INDICATOR MASTER DIM",
+        "x": 66.40759930915371,
+        "y": 55.36413469068129
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PSEU PRI",
+        "x": 6.102475532527346,
+        "y": 56.617071260767425
+    ,
+      "cb": "",
+      "location": "D1"
+    },
+        {
+            "text": "PSEU ALTN",
+        "x": 11.34139320667818,
+        "y": 56.617071260767425
+    ,
+      "cb": "",
+      "location": "D2"
+    },
+        {
+            "text": "INDICATOR MASTER DIM DIM/TST CONT",
+        "x": 58.43408175014393,
+        "y": 56.617071260767425
+    ,
+      "cb": "",
+      "location": "D11"
+    },
+        {
+            "text": "AIR/GND RELAY",
+        "x": 79.38975244674727,
+        "y": 56.617071260767425
+    ,
+      "cb": "",
+      "location": "D15"
+    },
+        {
+            "text": "ALT EXTEND SOL",
+        "x": 84.57109959700632,
+        "y": 56.2255285826155
+    ,
+      "cb": "",
+      "location": "D16"
+    },
+        {
+            "text": "NOSE GEAR STEER",
+        "x": 89.86758779504893,
+        "y": 56.617071260767425
+    ,
+      "cb": "",
+      "location": "D17"
+    },
+        {
+            "text": "AURAL WARN",
+        "x": 95.2216465169833,
+        "y": 57.16523101018011
+    ,
+      "cb": "",
+      "location": "D18"
+    },
+        {
+            "text": "OVERHEAD 28V PRI",
+        "x": 48.01381692573403,
+        "y": 57.7133907595928
+    ,
+      "cb": "",
+      "location": "D9"
+    },
+        {
+            "text": "OVERHEAD 28V SEC",
+        "x": 53.25273459988485,
+        "y": 57.63508222396241
+    ,
+      "cb": "",
+      "location": "D10"
+    },
+        {
+            "text": "INDICATOR MASTER DIM BAT",
+        "x": 63.672999424294765,
+        "y": 57.63508222396241
+    ,
+      "cb": "",
+      "location": "D12"
+    },
+        {
+            "text": "INDICATOR MASTER DIM BUS 1",
+        "x": 68.50892343120323,
+        "y": 57.63508222396241
+    ,
+      "cb": "",
+      "location": "D13"
+    },
+        {
+            "text": "INDICATOR MASTER DIM BUS 2",
+        "x": 74.09326424870466,
+        "y": 57.63508222396241
+    ,
+      "cb": "",
+      "location": "D14"
+    },
+        {
+            "text": "ENGINE FUEL",
+        "x": 25.51007484168106,
+        "y": 67.81519185591229
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "FUEL AUTO S/O UPCO BST PMP CTR TNK R AC",
+        "x": 37.53598157743235,
+        "y": 69.12842599843383
+    ,
+      "cb": "",
+      "location": "E7"
+    },
+        {
+            "text": "TO DISCONNECT CIRCUIT PULL (3) BREAKERS",
+        "x": 68.68163500287852,
+        "y": 67.58026624902115
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC3555",
+        "x": 81.8077144502015,
+        "y": 67.89350039154269
+    ,
+      "cb": "",
+      "location": "ROW_E"
+    },
+        {
+            "text": "LANDING GEAR",
+        "x": 89.39205526770294,
+        "y": 67.89350039154269
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENG 2 HPSOV CONT",
+        "x": 17.904432930339667,
+        "y": 70.24275646045419
+    ,
+      "cb": "",
+      "location": "E3"
+    },
+        {
+            "text": "ENG 2 HPSOV IND",
+        "x": 21.761658031088082,
+        "y": 70.94753328112763
+    ,
+      "cb": "",
+      "location": "E4"
+    },
+        {
+            "text": "ENG 1 HPSOV CONT",
+        "x": 28.0944156591825,
+        "y": 70.24275646045419
+    ,
+      "cb": "",
+      "location": "E5"
+    },
+
+        {
+            "text": "ENG 1 HPSOV IND",
+        "x": 32.0944156591825,
+        "y": 70.24275646045419
+    ,
+      "cb": "",
+      "location": "E6"
+    },
+        {
+            "text": "OVERHEAD 5V SECONDARY",
+        "x": 48.25043177892919,
+        "y": 71.1041503523884
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ANTISKID",
+        "x": 89.86758779504893,
+        "y": 70.7126076742365
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DOOR LOCK",
+        "x": 6.217616580310881,
+        "y": 71.41738449490994
+    ,
+      "cb": "",
+      "location": "E1"
+    },
+        {
+            "text": "SECT 1",
+        "x": 58.08865860679332,
+        "y": 71.88723570869224
+    ,
+      "cb": "",
+      "location": "E11"
+    },
+        {
+            "text": "SECT 2",
+        "x": 63.55785837651122,
+        "y": 71.88723570869224
+    ,
+      "cb": "",
+      "location": "E12"
+    },
+        {
+            "text": "SECT 3",
+        "x": 68.85434657455383,
+        "y": 71.88723570869224
+    ,
+      "cb": "",
+      "location": "E13"
+    },
+        {
+            "text": "SECT 4",
+        "x": 73.51755900978699,
+        "y": 71.88723570869224
+    ,
+      "cb": "",
+      "location": "E14"
+    },
+        {
+            "text": "ANTSKID INBD",
+        "x": 84.68624064478986,
+        "y": 71.96554424432263
+    ,
+      "cb": "",
+      "location": "E16"
+    },
+        {
+            "text": "ANTSKID OUTBD",
+        "x": 95.048934945308,
+        "y": 71.96554424432263
+    ,
+      "cb": "",
+      "location": "E18"
+    },
+        {
+            "text": "PROBE IND",
+        "x": 89.86758779504893,
+        "y": 82.14565387627252
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC2729",
+        "x": 94.93379389752447,
+        "y": 82.14565387627252
+    ,
+      "cb": "",
+      "location": "ROW_F"
+    },
+        {
+            "text": "28V DC SERVICE OUTLETS",
+        "x": 6.332757628094416,
+        "y": 84.1033672670321
+    ,
+      "cb": "",
+      "location": "F1"
+    },
+        {
+            "text": "OVERHEAD 5V SECONDARY",
+        "x": 47.72596430627519,
+        "y": 84.25998433829287
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PROBE INDICATION",
+        "x": 89.9251583189407,
+        "y": 85.19968676585748
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SECT 5",
+        "x": 58.37651122625216,
+        "y": 86.21769772905246
+    ,
+      "cb": "",
+      "location": "F11"
+    },
+        {
+            "text": "SECT 6",
+        "x": 63.500287852619465,
+        "y": 86.21769772905246
+    ,
+      "cb": "",
+      "location": "F12"
+    },
+        {
+            "text": "SECT 7",
+        "x": 68.85434657455383,
+        "y": 86.21769772905246
+    ,
+      "cb": "",
+      "location": "F13"
+    },
+        {
+            "text": "SECT 8",
+        "x": 74.0356937248129,
+        "y": 86.21769772905246
+    ,
+      "cb": "",
+      "location": "F14"
+    },
+        {
+            "text": "PROBE INDICATION FO",
+        "x": 84.57109959700632,
+        "y": 86.29600626468284
+    ,
+      "cb": "",
+      "location": "E16"
+    },
+        {
+            "text": "PROBE INDICATION CAPT",
+        "x": 95.10650546919976,
+        "y": 86.37431480031323
+    ,
+      "cb": "",
+      "location": "E18"
+    },
+        {
+            "text": "BAC27DCC2744",
+        "x": 97.3517559009787,
+        "y": 96.86765857478466
+    ,
+      "cb": "",
+      "location": "ROW_NUMBERS"
+    },
+        {
+            "text": "P6-3",
+        "x": 96.08520437535981,
+        "y": 98.82537196554424
+    }
+] ,
+
+
+    "p6_4MAX":[
+    {
+        "text": "TEMP CONT VALVE LEFT",
+        "x": 6.1671469740634,
+        "y": 11.666666666666668
+    ,
+      "cb": "",
+      "location": "A1"
+    },
+        {
+            "text": "AIR CONDITIONING",
+        "x": 27.550432276657062,
+        "y": 10.27450980392157
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AUX POWER UNIT",
+        "x": 71.00864553314122,
+        "y": 10.431372549019608
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-1106",
+        "x": 94.81268011527378,
+        "y": 10.196078431372548
+    ,
+      "cb": "",
+      "location": "ROW_A"
+    },
+        {
+            "text": "BLEED AIR CONTROL",
+        "x": 32.10374639769453,
+        "y": 11.607843137254902
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MISC LOADS LEFT",
+        "x": 42.4207492795389,
+        "y": 11.450980392156863
+    ,
+      "cb": "",
+      "location": "A8"
+    },
+        {
+            "text": "PACK CONTROL LEFT",
+        "x": 52.27665706051873,
+        "y": 11.607843137254902
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ZONE TEMP VALVE/FAN CONT",
+        "x": 13.487031700288185,
+        "y": 12.941176470588237
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RAM AIR MOD LEFT",
+        "x": 21.671469740634006,
+        "y": 12.313725490196079
+    ,
+      "cb": "",
+      "location": "A4"
+    },
+       
+        {
+            "text": "ZONE TEMP VALVE/FAN CONT AFT PASS",
+        "x": 16.772334293948127,
+        "y": 14.588235294117647
+    ,
+      "cb": "",
+      "location": "A3"
+    },
+        {
+            "text": "BLEED AIR VALVE ISLN",
+        "x": 26.85878962536023,
+        "y": 13.80392156862745
+    ,
+      "cb": "",
+      "location": "A5"
+    },
+        {
+            "text": "BLEED AIR CONTROL PRIM L",
+        "x": 31.930835734870318,
+        "y": 13.431372549019608
+    ,
+      "cb": "",
+      "location": "A6"
+    },
+        {
+            "text": "BLEED AIR CONTROL VALVES LEFT",
+        "x": 37.752161383285305,
+        "y": 13.80392156862745
+    ,
+      "cb": "",
+      "location": "A7"
+    },
+        {
+            "text": "APU CONT",
+        "x": 74.12103746397695,
+        "y": 14.352941176470587
+    ,
+      "cb": "",
+      "location": "A14"
+    },
+        {
+            "text": "TEMP CONT VALVE CLOSE RIGHT",
+        "x": 6.1671469740634,
+        "y": 25.627450980392158
+    ,
+      "cb": "",
+      "location": "B1"
+    },
+        {
+            "text": "AIR CONDITIONING",
+        "x": 27.550432276657062,
+        "y": 24.509803921568626
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "233A5116-1117",
+        "x": 94.81268011527378,
+        "y": 24.549019607843135
+    ,
+      "cb": "",
+      "location": "ROW_B"
+    },
+        {
+            "text": "BLEED AIR CONTROL",
+        "x": 31.988472622478387,
+        "y": 26.03921568627451
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "MISC LOADS RIGHT",
+        "x": 42.53602305475505,
+        "y": 25.882352941176475
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PACK CONTROL RIGHT",
+        "x": 52.27665706051873,
+        "y": 25.41176470588235
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ZONE TEMP VALVE/FAN CONT",
+        "x": 13.487031700288185,
+        "y": 26.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RAM AIR MOD RIGHT",
+        "x": 21.729106628242075,
+        "y": 26.745098039215687
+    ,
+      "cb": "",
+      "location": "B4"
+    },
+        {
+            "text": "PACK CONTROL RIGHT",
+        "x": 52.564841498559076,
+        "y": 26.666666666666668
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ZONE TEMP VALVE/FAN CONT FWD PASS",
+        "x": 11.123919308357348,
+        "y": 28.3921568627451
+    ,
+      "cb": "",
+      "location": "B2"
+    },
+        {
+            "text": "ZONE TEMP VALVE/FAN CONT FLT DK",
+        "x": 16.59942363112392,
+        "y": 28.549019607843135
+    ,
+      "cb": "",
+      "location": "B3"
+    },
+        {
+            "text": "BLEED AIR CONTROL PRESS IND",
+        "x": 26.97406340057637,
+        "y": 28.15686274509804
+    ,
+      "cb": "",
+      "location": "B5"
+    },
+        {
+            "text": "BLEED AIR CONTROL PRIM R",
+        "x": 32.10374639769453,
+        "y": 28.705882352941174
+    ,
+      "cb": "",
+      "location": "B6"
+    },
+        {
+            "text": "BLEED AIR CONTROL VALVES RIGHT",
+        "x": 37.752161383285305,
+        "y": 28.196078431372552
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AIR CONDITIONING",
+        "x": 27.550432276657062,
+        "y": 38.666666666666664
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EQUIPMENT COOLING",
+        "x": 70.835734870317,
+        "y": 38.666666666666664
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC2849",
+        "x": 94.69740634005763,
+        "y": 38.509803921568626
+    ,
+      "cb": "",
+      "location": "ROW_C"
+    },
+        {
+            "text": "PACK/ENGINE BLEED AIR OVHT",
+        "x": 40.345821325648416,
+        "y": 39.68627450980392
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ZONE TEMP DUCT OVHT",
+        "x": 16.54178674351585,
+        "y": 39.94117647058824
+    ,
+      "cb": "",
+      "location": ""
+    },
+       
+        {
+            "text": "PACK CONT VALVES",
+        "x": 30.066282420749282,
+        "y": 41.568627450980394
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SUPPLY FAN CONTROL",
+        "x": 66.10951008645533,
+        "y": 41.01960784313726
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXHAUST FAN CONTROL",
+        "x": 76.77233429394813,
+        "y": 41.01960784313726
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ZONE TEMP DUCT OVHT AFT PASS",
+        "x": 11.123919308357348,
+        "y": 41.88235294117647
+    ,
+      "cb": "",
+      "location": "C2"
+    },
+        {
+            "text": "ZONE TEMP DUCT OVHT FLT DECK",
+        "x": 21.786743515850144,
+        "y": 41.80392156862745
+    ,
+      "cb": "",
+      "location": "C4"
+    },
+       
+        {
+            "text": "ZONE TEMP DUCT OVHT FWD PASS",
+        "x": 16.65706051873199,
+        "y": 43.13725490196079
+    ,
+      "cb": "",
+      "location": "C3"
+    },
+        {
+            "text": "PACK CONTROL VALVES RIGHT",
+        "x": 26.9164265129683,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C5"
+    },
+        {
+            "text": "PACK CONTROL VALVES LEFT",
+        "x": 32.16138328530259,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C6"
+    },
+        {
+            "text": "PACK/ENGINE BLEED AIR OVHT RIGHT",
+        "x": 37.636887608069166,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C7"
+    },
+        {
+            "text": "PACK/ENGINE BLEED AIR OVHT LEFT",
+        "x": 42.88184438040346,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C8"
+    },
+        {
+            "text": "SUPPLY FAN CONTROL NORMAL",
+        "x": 63.63112391930835,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C12"
+    },
+        {
+            "text": "SUPPLY FAN CONTROL ALTN",
+        "x": 68.81844380403457,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C13"
+    },
+        {
+            "text": "EXHAUST FAN CONTROL NORMAL",
+        "x": 74.12103746397695,
+        "y": 43.2156862745098
+    ,
+      "cb": "",
+      "location": "C14"
+    },
+        {
+            "text": "EXHAUST FAN CONTROL ALTN",
+        "x": 79.36599423631124,
+        "y": 43.05882352941177
+    ,
+      "cb": "",
+      "location": "C15"
+    },
+
+        {
+            "text": "AIR  CONDITIONING",
+        "x": 19.68299711815562,
+        "y": 53.05882352941177
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELECTRICAL",
+        "x": 58.242074927953894,
+        "y": 53.09803921568628
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "AC BUS",
+        "x": 84.61095100864553,
+        "y": 53.09803921568628
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "OVERBOARD EXHAUST VALVE",
+        "x": 8.760806916426512,
+        "y": 54.98039215686275
+    ,
+      "cb": "",
+      "location": ""
+    },
+        
+        {
+            "text": "BLEED AIR CONT BCK",
+        "x": 30.028818443804035,
+        "y": 55.2156862745098
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TRIM AIR PRESSURE",
+        "x": 47.83861671469741,
+        "y": 54.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "XFER BUS 2 115V AC IND",
+        "x": 68.87608069164266,
+        "y": 54.352941176470594
+    ,
+      "cb": "",
+      "location": "D13"
+    },
+        {
+            "text": "28VAC XFR BUS 2 SECT 2",
+        "x": 74.00576368876081,
+        "y": 54.8235294117647
+    ,
+      "cb": "",
+      "location": "D14"
+    },
+        {
+            "text": "AC BUS STBY BUS",
+        "x": 82.07492795389048,
+        "y": 55.372549019607845
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PACK CONT VALVES",
+        "x": 19.88472622478386,
+        "y": 55.92156862745098
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "TEMP IND",
+        "x": 42.59365994236311,
+        "y": 56.470588235294116
+    ,
+      "cb": "",
+      "location": "D8"
+    },
+        {
+            "text": "TRIM AIR PRESS",
+        "x": 47.89625360230548,
+        "y": 56.15686274509804
+    ,
+      "cb": "",
+      "location": "D9"
+    },
+        {
+            "text": "GND SERV DC 1",
+        "x": 58.443804034582136,
+        "y": 56.392156862745104
+    ,
+      "cb": "",
+      "location": "D11"
+    },
+        {
+            "text": "AC STBY BUS 28V AC DISTR",
+        "x": 79.42363112391931,
+        "y": 56.470588235294116
+    ,
+      "cb": "",
+      "location": "D15"
+    },
+        {
+            "text": "AC STBY BUS 115V AC IND",
+        "x": 84.49567723342939,
+        "y": 56.392156862745104
+    ,
+      "cb": "",
+      "location": "D16"
+    },
+        {
+            "text": "AC STBY BUS PWR",
+        "x": 95.1585014409222,
+        "y": 56.392156862745104
+    ,
+      "cb": "",
+      "location": "D18"
+    },
+        {
+            "text": "OVERBOARD EXHAUST VALVE CONT",
+        "x": 6.109510086455332,
+        "y": 57.490196078431374
+    ,
+      "cb": "",
+      "location": "D1"
+    },
+        {
+            "text": "OVERBOARD EXHAUST VALVE RECONFIG CONT",
+        "x": 11.239193083573488,
+        "y": 57.568627450980394
+    ,
+      "cb": "",
+      "location": "D2"
+    },
+        {
+            "text": "PACK CONT VALVES L ALT",
+        "x": 16.887608069164266,
+        "y": 57.72549019607843
+    ,
+      "cb": "",
+      "location": "D3"
+    },
+        {
+            "text": "PACK CONT VALVES R ALT",
+        "x": 22.478386167146976,
+        "y": 57.568627450980394
+    ,
+      "cb": "",
+      "location": "D4"
+    },
+        {
+            "text": "BLEED AIR CONT BCK LEFT",
+        "x": 26.97406340057637,
+        "y": 57.568627450980394
+    ,
+      "cb": "",
+      "location": "D5"
+    },
+        {
+            "text": "BLEED AIR CONT BCK RIGHT",
+        "x": 32.391930835734875,
+        "y": 57.568627450980394
+    ,
+      "cb": "",
+      "location": "D6"
+    },
+        {
+            "text": "AIR CONDITIONING",
+        "x": 24.35158501440922,
+        "y": 66.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ENTRY LIGHTS",
+        "x": 47.36023054755044,
+        "y": 66.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELECTRICAL",
+        "x": 63.51585014409223,
+        "y": 66.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+
+        {
+            "text": "233A5116-1077",
+        "x": 95.48126801152738,
+        "y": 53.13725490196079
+    ,
+      "cb": "",
+      "location": "ROW_D"
+    },
+
+        {
+            "text": "BAC27DCC2891",
+        "x": 73.48126801152738,
+        "y": 67.13725490196079
+    ,
+      "cb": "",
+      "location": "ROW_E"
+    },
+        {
+            "text": "DC BUS INDICATION",
+        "x": 89.20172910662824,
+        "y": 66.90196078431373
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "RECIRC FAN RIGHT",
+        "x": 16.311239193083573,
+        "y": 68.94117647058823
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GND SERV",
+        "x": 66.22478386167147,
+        "y": 69.01960784313725
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "SW HOT BAT BUS",
+        "x": 84.78386167146974,
+        "y": 69.17647058823529
+    ,
+      "cb": "",
+      "location": "E16"
+    },
+        {
+            "text": "RECIRC FAN RIGHT CONT",
+        "x": 11.239193083573488,
+        "y": 71.2156862745098
+    ,
+      "cb": "",
+      "location": "E2"
+    },
+        {
+            "text": "RECIRC FAN RIGHT CABIN AIR",
+        "x": 21.671469740634006,
+        "y": 71.13725490196079
+    ,
+      "cb": "",
+      "location": "E4"
+    },
+        {
+            "text": "ENTRY LIGHTS DIM",
+        "x": 47.89625360230548,
+        "y": 71.13725490196079
+    ,
+      "cb": "",
+      "location": "E9"
+    },
+        {
+            "text": "TR3 XFR RELAY CONT",
+        "x": 58.674351585014406,
+        "y": 70.19607843137254
+    ,
+      "cb": "",
+      "location": "E11"
+    },
+        {
+            "text": "GND SERV DC HOT BAT",
+        "x": 63.40057636887608,
+        "y": 70.74509803921568
+    ,
+      "cb": "",
+      "location": "E12"
+    },
+        {
+            "text": "GND SERV DC CONT",
+        "x": 68.87608069164266,
+        "y": 71.05882352941177
+    ,
+      "cb": "",
+      "location": "E13"
+    },
+        {
+            "text": "DC BUS IND HOT BAT",
+        "x": 79.48126801152738,
+        "y": 70.74509803921568
+    ,
+      "cb": "",
+      "location": "E15"
+    },
+        {
+            "text": "DC BUS IND SW HOT BAT",
+        "x": 84.72622478386167,
+        "y": 70.74509803921568
+    ,
+      "cb": "",
+      "location": "E16"
+    },
+        {
+            "text": "DC BUS IND STBY",
+        "x": 94.98559077809799,
+        "y": 71.13725490196079
+    ,
+      "cb": "",
+      "location": "E18"
+    },
+       
+        {
+            "text": "PRESSURIZATION CONTROL",
+        "x": 21.556195965417867,
+        "y": 82.11764705882352
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GENERATOR",
+        "x": 54.00576368876081,
+        "y": 81.96078431372548
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC BUS INDICATION",
+        "x": 85.0720461095101,
+        "y": 81.96078431372548
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAC27DCC2753",
+        "x": 95.04322766570606,
+        "y": 82.03921568627452
+    ,
+      "cb": "",
+      "location": "ROW_F"
+    },
+        {
+            "text": "APU GEN CONT UNIT",
+        "x": 63.74639769452449,
+        "y": 83.05882352941177
+    ,
+      "cb": "",
+      "location": "F12"
+    },
+        {
+            "text": "BUS PWR CONT UNIT",
+        "x": 68.87608069164266,
+        "y": 83.05882352941177
+    ,
+      "cb": "",
+      "location": "F13"
+    },
+        {
+            "text": "PRESS CONT LCD LTG",
+        "x": 6.109510086455332,
+        "y": 85.6470588235294
+    ,
+      "cb": "",
+      "location": "F1"
+    },
+        {
+            "text": "PRESS CONT AUTO",
+        "x": 21.671469740634006,
+        "y": 84.86274509803921
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GENERATOR DISC",
+        "x": 45.4178674351585,
+        "y": 85.09803921568627
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GENERATOR CONT UNT",
+        "x": 55.52449567723343,
+        "y": 85.09803921568627
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PRESS CONT MANUAL",
+        "x": 32.27665706051873,
+        "y": 86.19607843137254
+    ,
+      "cb": "",
+      "location": "F6"
+    },
+        {
+            "text": "PRESS CONT IND",
+        "x": 37.52161383285302,
+        "y": 86.19607843137254
+    ,
+      "cb": "",
+      "location": "F7"
+    },
+        {
+            "text": "DC BUS IND BAT",
+        "x": 74.00576368876081,
+        "y": 86.11764705882354
+    ,
+      "cb": "",
+      "location": "E14"
+    },
+        {
+            "text": "DC BUS IND BUS 1",
+        "x": 84.61095100864553,
+        "y": 86.19607843137254
+    ,
+      "cb": "",
+      "location": "E16"
+    },
+        {
+            "text": "DC BUS IND BUS 2",
+        "x": 94.98559077809799,
+        "y": 86.19607843137254
+    ,
+      "cb": "",
+      "location": "E18"
+    },
+        {
+            "text": "BAC27DCC2744",
+        "x": 92.69452449567724,
+        "y": 96.62745098039215
+    ,
+      "cb": "",
+      "location": "ROW_NUMBER"
+    },
+        {
+            "text": "P6-4",
+        "x": 96.08069164265129,
+        "y": 98.66666666666667
+    }
+] ,
+//FOTO, YAZI, CB DEGER VE LOKASYON DOGRU. CB VE LOKASYON EKLENDİ.
+    "p91_MAX":[
+    {
+        "text": "P91",
+        "x": 37.23342939481268,
+        "y": 4.08
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "P91 POWER DISTRIBUTION PANEL",
+        "x": 52.1613832853026,
+        "y": 4.0
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC BUS 1",
+        "x": 10.835734870317003,
+        "y": 6.239999999999999
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "115 VAC TRANSFER BUS 1",
+        "x": 35.44668587896253,
+        "y": 6.16
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC BUS 1 XFR",
+        "x": 8.818443804034583,
+        "y": 12.72
+    ,
+      "cb": "C01065",
+      "location": "A1"
+    },
+        {
+            "text": "DC BUS 1 SECT 1",
+        "x": 13.256484149855908,
+        "y": 12.64
+    ,
+      "cb": "C03051",
+      "location": "A2"
+    },
+        {
+            "text": "TRU 3 ALTN",
+        "x": 22.420749279538903,
+        "y": 12.72
+    ,
+      "cb": "C00941",
+      "location": "A4"
+    },
+        {
+            "text": "TRU 1",
+        "x": 31.066282420749282,
+        "y": 12.72
+    ,
+      "cb": "C00806",
+      "location": "A6"
+    },
+        {
+            "text": "EQPT CLG SPLY FAN PWR-ALTN",
+        "x": 40.345821325648416,
+        "y": 12.72
+    ,
+      "cb": "C00935",
+      "location": "A8"
+    },
+        {
+            "text": "APU START CONV",
+        "x": 53.94812680115274,
+        "y": 12.64
+    ,
+      "cb": "C01336",
+      "location": "A11"
+    },
+        {
+            "text": "GND SER 1",
+        "x": 68.2420749279539,
+        "y": 12.479999999999999
+    ,
+      "cb": "C00813",
+      "location": "A14"
+    },
+        {
+            "text": "28 VAC TRANSFER BUS 1",
+        "x": 50.778097982708935,
+        "y": 25.2
+    ,
+      "cb": "",
+      "location": ""
+    },             {
+            "text": "PASSENGER READING LIGHTS-LEFT",
+        "x": 50.48991354466858,
+        "y": 31.840000000000003
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28V AC TRANSFER BUS 1",
+        "x": 74.81268011527378,
+        "y": 31.840000000000003
+    ,
+      "cb": "C02044",
+      "location": "B10"
+    },
+        {
+            "text": "AC APU GEN IND",
+        "x": 79.30835734870317,
+        "y": 31.840000000000003
+    ,
+      "cb": "C00015",
+      "location": "B11"
+    },
+        {
+            "text": "AC GEN 1 IND",
+        "x": 83.45821325648414,
+        "y": 31.840000000000003
+    ,
+      "cb": "C00014",
+      "location": "B12"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 340-451",
+        "x": 33.77521613832853,
+        "y": 33.2
+    ,
+      "cb": "C00087",
+      "location": "B1"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 451-500E",
+        "x": 38.27089337175792,
+        "y": 33.2
+    ,
+      "cb": "C00088",
+      "location": "B2"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 500E-552",
+        "x": 42.70893371757925,
+        "y": 33.2
+    ,
+      "cb": "C00089",
+      "location": "B3"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 552-692",
+        "x": 47.14697406340058,
+        "y": 33.2
+    ,
+      "cb": "C00090",
+      "location": "B4"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 692-727B",
+        "x": 51.5850144092219,
+        "y": 33.2
+    ,
+      "cb": "C00091",
+      "location": "B5"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 727B-727G",
+        "x": 56.138328530259365,
+        "y": 33.2
+    ,
+      "cb": "C00092",
+      "location": "B6"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 727G-768",
+        "x": 60.69164265129683,
+        "y": 33.44
+    ,
+      "cb": "C00773",
+      "location": "B7"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 768-880",
+        "x": 65.76368876080691,
+        "y": 33.36
+    ,
+      "cb": "C01152",
+      "location": "B8"
+    },
+        {
+            "text": "PAX READING LIGHTS-LH STA 880-937",
+        "x": 70.20172910662824,
+        "y": 33.36
+    ,
+      "cb": "C01153",
+      "location": "B9"
+    },
+
+        {
+            "text": "GEN 1 PWR LIGHT",
+        "x": 11.815561959654179,
+        "y": 40.08
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28 VAC GND SERVICE BUS 1",
+        "x": 43.861671469740635,
+        "y": 37.44
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28 VDC BUS 1",
+        "x": 71.81556195965419,
+        "y": 37.44
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXT PWR PWR LIGHT",
+        "x": 11.815561959654179,
+        "y": 45.239999999999995
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "ELEC RACK LT FWD",
+        "x": 38.21325648414985,
+        "y": 44.32
+    ,
+      "cb": "",
+      "location": "C8"
+    },
+        {
+            "text": "WORK & THRSH LT",
+        "x": 42.47838616714697,
+        "y": 44.32
+    ,
+      "cb": "C00140",
+      "location": "C3"
+    },
+        {
+            "text": "ACCESS COMPT LT",
+        "x": 51.527377521613836,
+        "y": 44.24
+    ,
+      "cb": "C00389",
+      "location": "C5"
+    },
+        {
+            "text": "GEN 1 LOAD SHED",
+        "x": 60.51873198847262,
+        "y": 44.4
+    ,
+      "cb": "C01288",
+      "location": "C7"
+    },
+        {
+            "text": "ELEC HYD PUMP CONT SYS B",
+        "x": 65.64841498559078,
+        "y": 44.32
+    ,
+      "cb": "C00768",
+      "location": "C8"
+    },
+        {
+            "text": "WATER QTY IND",
+        "x": 69.85590778097983,
+        "y": 44.32
+    ,
+      "cb": "C00138",
+      "location": "C9"
+    },
+        {
+            "text": "BUS PWVR CONT UNIT",
+        "x": 74.5821325648415,
+        "y": 44.32
+    ,
+      "cb": "C01327",
+      "location": "C10"
+    },
+        {
+            "text": "VACUUM WASTE CONT",
+        "x": 79.36599423631124,
+        "y": 44.32
+    ,
+      "cb": "C01388",
+      "location": "C11"
+    },
+        {
+            "text": "DC BUS 1 SECT 2",
+        "x": 84.51585014409221,
+        "y": 44.32
+    ,
+      "cb": "C03052",
+      "location": "C12"
+    },
+        {
+            "text": "TIE BUS PWR LIGHT",
+        "x": 11.815561959654179,
+        "y": 50.239999999999995
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GND SERV CLG NIGHT CONT",
+        "x": 47.08933717579251,
+        "y": 45.68
+    ,
+      "cb": "C00184",
+      "location": "C4"
+    },  
+        {
+            "text": "MAIN BUS 1",
+        "x": 73.67146974063401,
+        "y": 48.480000000000004
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "115 VAC XFR BUS 1 SECT 2",
+        "x": 44.38040345821326,
+        "y": 49.6
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "APU PWR PWR LIGHT",
+        "x": 11.815561959654179,
+        "y": 55.28
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BOOST PUMP TANK 1 FWD",
+        "x": 33.89048991354467,
+        "y": 56.720000000000006
+    ,
+      "cb": "C00827",
+      "location": "D1"
+    },
+        {
+            "text": "BOOST PUMP TANK 2 AFT",
+        "x": 42.93948126801153,
+        "y": 56.720000000000006
+    ,
+      "cb": "C00828",
+      "location": "D3"
+    },
+        {
+            "text": "BOOST PUMP TANK CTR LEFT",
+        "x": 51.815561959654175,
+        "y": 56.720000000000006
+    ,
+      "cb": "C00845",
+      "location": "D5"
+    },
+        {
+            "text": "DOOR AREA HTR-AFT",
+        "x": 61.90201729106628,
+        "y": 56.64
+    ,
+      "cb": "C01279",
+      "location": "D7"
+    },
+        {
+            "text": "DOOR AREA HTR-FWD",
+        "x": 70.54755043227667,
+        "y": 56.56
+    ,
+      "cb": "C01280",
+      "location": "D9"
+    },
+        {
+            "text": "POT WATER CMPSR",
+        "x": 79.76945244956772,
+        "y": 56.56
+    ,
+      "cb": "C00873",
+      "location": "D11"
+    },
+        {
+            "text": "115 VAC GND SERVICE BUS 1",
+        "x": 58.328530259366,
+        "y": 61.919999999999995
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EQPT CLG EXH FAN PWR-NORM",
+        "x": 33.89048991354467,
+        "y": 69.19999999999999
+    ,
+      "cb": "C00836",
+      "location": "E1"
+    },
+        {
+            "text": "AUX BAT CHGR",
+        "x": 42.53602305475505,
+        "y": 69.12
+    ,
+      "cb": "C00922",
+      "location": "E3"
+    },
+        {
+            "text": "GND SRV 1 SECT 1",
+        "x": 51.5850144092219,
+        "y": 69.19999999999999
+    ,
+      "cb": "C03041",
+      "location": "E5"
+    },
+        {
+            "text": "CEILING LT AFT LH",
+        "x": 61.26801152737752,
+        "y": 69.19999999999999
+    ,
+      "cb": "C01937",
+      "location": "E7"
+    },
+        {
+            "text": "CEILING LT AFT RH",
+        "x": 66.05187319884726,
+        "y": 69.19999999999999
+    ,
+      "cb": "C01938",
+      "location": "E8"
+    },
+        {
+            "text": "CEILING LT R",
+        "x": 70.37463976945246,
+        "y": 69.19999999999999
+    ,
+      "cb": "C00590",
+      "location": "E9"
+    },
+        {
+            "text": "CEILING LT L",
+        "x": 74.5821325648415,
+        "y": 69.04
+    ,
+      "cb": "C00591",
+      "location": "E10"
+    },
+        {
+            "text": "BRT ENTRY LT (INOP)",
+        "x": 79.71181556195965,
+        "y": 69.04
+    ,
+      "cb": "C00413",
+      "location": "E11"
+    },
+        {
+            "text": "28 VAC GND SERV 1",
+        "x": 83.9193083573487,
+        "y": 69.12
+    ,
+      "cb": "C00041",
+      "location": "E12"
+    }, 
+        {
+            "text": "XFR BUS 1 (IFE INOP)",
+        "x": 6.9740634005763695,
+        "y": 94.64
+    ,
+      "cb": "C03003",
+      "location": "F1"
+    },
+        {
+            "text": "VACUUM WASTE BLOWER",
+        "x": 19.2507204610951,
+        "y": 94.48
+    ,
+      "cb": "C01389",
+      "location": "F2"
+    },
+        {
+            "text": "ELEC HYD PUMP SYS B",
+        "x": 31.988472622478387,
+        "y": 94.48
+    ,
+      "cb": "C00882",
+      "location": "F3"
+    },
+        {
+            "text": "XFR BUS 1 SECT 2",
+        "x": 43.804034582132566,
+        "y": 94.48
+    ,
+      "cb": "C03001",
+      "location": "F4"
+    },
+        {
+            "text": "XFER BUS 1 SECT 2",
+        "x": 56.31123919308357,
+        "y": 94.56
+    ,
+      "cb": "C03002",
+      "location": "F5"
+    },
+        {
+            "text": "MAIN BUS 1",
+        "x": 68.60806916426513,
+        "y": 94.56
+    ,
+      "cb": "C00815",
+      "location": "F6"
+    },
+        {
+            "text": "GALLEY BUS C",
+        "x": 81.44092219020173,
+        "y": 94.48
+    ,
+      "cb": "C00913",
+      "location": "F7"
+    },
+        {
+            "text": "GALLEY BUS D",
+        "x": 93.8328530259366,
+        "y": 94.56
+    ,
+      "cb": "C00915",
+      "location": "F8"
+    }
+],
+
+//FOTO, YAZI, CB DEGER VE LOKASYON DOGRU. CB VE LOKASYON EKLENDI
+    "p92max":[
+    {
+        "text": "P92",
+        "x": 37.23342939481268,
+        "y": 4.365079365079365
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "P92 POWER DISTRIBUTION PANEL",
+        "x": 52.1613832853026,
+        "y": 4.365079365079365
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC BUS 2",
+        "x": 11.469740634005763,
+        "y": 6.587301587301588
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "115 VAC TRANSFER BUS 2",
+        "x": 34.178674351585016,
+        "y": 6.507936507936509
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXTERNAL POWER",
+        "x": 72.62247838616715,
+        "y": 6.428571428571428
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "DC BUS 2 XFR",
+        "x": 9.106628242074928,
+        "y": 12.857142857142856
+    ,
+      "cb": "C01066",
+      "location": "A1"
+    },
+        {
+            "text": "DC BUS 2 SECT 2",
+        "x": 13.602305475504323,
+        "y": 12.857142857142856
+    ,
+      "cb": "C03072",
+      "location": "A2"
+    },
+        {
+            "text": "TRU 2",
+        "x": 22.363112391930837,
+        "y": 12.936507936507939
+    ,
+      "cb": "C00807",
+      "location": "A4"
+    },
+        {
+            "text": "TRU 3",
+        "x": 31.354466858789625,
+        "y": 12.936507936507939
+    ,
+      "cb": "C00808",
+      "location": "A6"
+    },
+        {
+            "text": "GND SERV 2",
+        "x": 44.78386167146974,
+        "y": 12.619047619047619
+    ,
+      "cb": "C02813",
+      "location": "A9"
+    },
+        {
+            "text": "EXT PWR BPCU",
+        "x": 58.789625360230545,
+        "y": 12.857142857142856
+    ,
+      "cb": "C00936",
+      "location": "A12"
+    },
+        {
+            "text": "EXT PWR 2",
+        "x": 72.85302593659942,
+        "y": 12.936507936507939
+    ,
+      "cb": "C02812",
+      "location": "A15"
+    },
+        {
+            "text": "EXT PWR 1",
+        "x": 86.45533141210375,
+        "y": 12.936507936507939
+    ,
+      "cb": "C00812",
+      "location": "A18"
+    },
+        {
+            "text": "28 VAC TRANSFER BUS 2",
+        "x": 34.87031700288185,
+        "y": 25.476190476190474
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "PASSENGER READING LIGHTS - RIGHT",
+        "x": 34.98559077809798,
+        "y": 32.06349206349206
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28V AC XFER BUS 2",
+        "x": 59.02017291066283,
+        "y": 32.142857142857146
+    ,
+      "cb": "C02045",
+      "location": "B10"
+    },
+        {
+            "text": "AC GEN 2 IND",
+        "x": 68.47262247838617,
+        "y": 32.61904761904762
+    ,
+      "cb": "C00016",
+      "location": "B12"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA340-451",
+        "x": 17.92507204610951,
+        "y": 33.33333333333333
+    ,
+      "cb": "C00094",
+      "location": "B1"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA451-500E",
+        "x": 22.363112391930837,
+        "y": 33.33333333333333
+    ,
+      "cb": "C00095",
+      "location": "B2"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA500E-552",
+        "x": 26.801152737752158,
+        "y": 33.41269841269841
+    ,
+      "cb": "C00096",
+      "location": "B3"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA552-692",
+        "x": 31.239193083573486,
+        "y": 33.41269841269841
+    ,
+      "cb": "C00097",
+      "location": "B4"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA692-727B",
+        "x": 35.67723342939481,
+        "y": 33.33333333333333
+    ,
+      "cb": "C00098",
+      "location": "B5"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA727B-727G",
+        "x": 40.23054755043228,
+        "y": 33.41269841269841
+    ,
+      "cb": "C00099",
+      "location": "B6"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA727G-768",
+        "x": 44.78386167146974,
+        "y": 33.41269841269841
+    ,
+      "cb": "C00774",
+      "location": "B7"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA768-880",
+        "x": 49.68299711815562,
+        "y": 33.41269841269841
+    ,
+      "cb": "C01437",
+      "location": "B8"
+    },
+        {
+            "text": "PAX READING LIGHTS-RH STA880-937",
+        "x": 54.23631123919308,
+        "y": 33.41269841269841
+    ,
+      "cb": "C01438",
+      "location": "B9"
+    },
+        {
+            "text": "GEN 2 PWR LIGHT",
+        "x": 83.72334293948127,
+        "y": 36.19047619047619
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28 VAC GND SERVICE BUS 2",
+        "x": 28.530259365994237,
+        "y": 37.53968253968254
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "28 VDC BUS 2",
+        "x": 56.65706051873198,
+        "y": 37.5
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "EXT PWR PWR LIGHT",
+        "x": 83.72334293948127,
+        "y": 41.42857142857143
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "GND SRV WDO BRT CONT (INOP?)",
+        "x": 18.155619596541786,
+        "y": 44.36507936507936
+    ,
+      "cb": "C01200",
+      "location": "C1"
+    },
+        {
+            "text": "WHEEL WELL LIGHT",
+        "x": 22.363112391930837,
+        "y": 44.36507936507936
+    ,
+      "cb": "C00125",
+      "location": "C2"
+    },
+        {
+            "text": "AIR COND COMPT LT FWD",
+        "x": 26.74351585014409,
+        "y": 44.36507936507936
+    ,
+      "cb": "C00126",
+      "location": "C3"
+    },
+        {
+            "text": "CARGO COMPT LT FWD",
+        "x": 31.12391930835735,
+        "y": 44.36507936507936
+    ,
+      "cb": "C00127",
+      "location": "C4"
+    },
+        {
+            "text": "CARGO COMPT LT AFT",
+        "x": 35.61959654178674,
+        "y": 44.36507936507936
+    ,
+      "cb": "C00128",
+      "location": "C5"
+    },
+        {
+            "text": "GEN 2 LOAD SHED",
+        "x": 44.95677233429395,
+        "y": 44.44444444444444
+    ,
+      "cb": "C01289",
+      "location": "C7"
+    },
+        {
+            "text": "ELEC HYD PUMP CONT SYS A",
+        "x": 49.79827089337176,
+        "y": 44.36507936507936
+    ,
+      "cb": "C00767",
+      "location": "C8"
+    },
+        {
+            "text": "APU GEN CONT UNIT",
+        "x": 54.00576368876081,
+        "y": 44.36507936507936
+    ,
+      "cb": "C01326",
+      "location": "C9"
+    },
+        {
+            "text": "CARGO LT CONT",
+        "x": 58.674351585014406,
+        "y": 44.36507936507936
+    ,
+      "cb": "C01419",
+      "location": "C10"
+    },
+        {
+            "text": "DC BUS 2 SECT 1",
+        "x": 68.01152737752162,
+        "y": 44.36507936507936
+    ,
+      "cb": "C03071",
+      "location": "C12"
+    },
+        {
+            "text": "TIE BUS PWR LIGHT",
+        "x": 83.72334293948127,
+        "y": 46.34920634920635
+    ,
+      "cb": "",
+      "location": ""
+    },
+       
+        {
+            "text": "28 VAC XFR BUS 2 SECT 2",
+        "x": 25.64841498559078,
+        "y": 49.60317460317461
+    ,
+      "cb": "",
+      "location": ""
+    },
+       
+        {
+            "text": "XFR BUS 1 PWR LIGHT",
+        "x": 83.72334293948127,
+        "y": 51.269841269841265
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BOOST PUMP TANK 1 AFT",
+        "x": 17.92507204610951,
+        "y": 56.74603174603175
+    ,
+      "cb": "C00826",
+      "location": "D1"
+    },
+        {
+            "text": "BOOST PUMP TANK 2 FWD",
+        "x": 26.97406340057637,
+        "y": 56.666666666666664
+    ,
+      "cb": "C00829",
+      "location": "D3"
+    },
+        {
+            "text": "BOOST PUMP TANK CTR RIGHT",
+        "x": 35.67723342939481,
+        "y": 56.666666666666664
+    ,
+      "cb": "C00846",
+      "location": "D5"
+    },
+        {
+            "text": "EQPT CLG SPLY FAN PWR- NORM",
+        "x": 58.90489913544668,
+        "y": 56.34920634920635
+    ,
+      "cb": "C00934",
+      "location": "D10"
+    },
+        {
+            "text": "EQPT CLG EXH FAN PWR -ALTN",
+        "x": 67.89625360230548,
+        "y": 56.03174603174603
+    ,
+      "cb": "C00837",
+      "location": "D12"
+    },
+        {
+            "text": "115 VAC GND SERVICE BUS 2",
+        "x": 42.4207492795389,
+        "y": 61.78571428571429
+    ,
+      "cb": "",
+      "location": ""
+    },
+        {
+            "text": "BAT CHGR",
+        "x": 17.98270893371758,
+        "y": 68.96825396825396
+    ,
+      "cb": "C00809",
+      "location": "E1"
+    },
+        {
+            "text": "COVE LT",
+        "x": 36.2536023054755,
+        "y": 69.28571428571428
+    ,
+      "cb": "C01939",
+      "location": "E5"
+    },
+        {
+            "text": "28V AC GND SERV 2",
+        "x": 40.17291066282421,
+        "y": 68.88888888888889
+    ,
+      "cb": "C00040",
+      "location": "E6"
+    },
+        {
+            "text": "SERV OUTLET",
+        "x": 45.18731988472622,
+        "y": 68.96825396825396
+    ,
+      "cb": "C00116",
+      "location": "E7"
+    },
+        {
+            "text": "VAC OUTLET FWD",
+        "x": 49.62536023054755,
+        "y": 68.96825396825396
+    ,
+      "cb": "C00118",
+      "location": "E8"
+    },
+        {
+            "text": "VAC OUTLET AFT",
+        "x": 54.06340057636888,
+        "y": 68.96825396825396
+    ,
+      "cb": "C00119",
+      "location": "E9"
+    },
+        {
+            "text": "GALLEY LT",
+        "x": 58.731988472622476,
+        "y": 68.96825396825396
+    ,
+      "cb": "C00242",
+      "location": "E10"
+    },
+        {
+            "text": "WDO LT RIGHT",
+        "x": 63.51585014409223,
+        "y": 68.88888888888889
+    ,
+      "cb": "C00594",
+      "location": "E11"
+    },
+        {
+            "text": "WDO LT LEFT",
+        "x": 67.89625360230548,
+        "y": 68.88888888888889
+    ,
+      "cb": "C00776",
+      "location": "E12"
+    },        {
+            "text": "XFR BUS 2 IFE",
+        "x": 6.9164265129683,
+        "y": 94.92063492063491
+    ,
+      "cb": "C03013",
+      "location": "F1"
+    },
+        {
+            "text": "STBY HYD PUMP",
+        "x": 18.904899135446687,
+        "y": 94.36507936507937
+    ,
+      "cb": "C01449",
+      "location": "F2"
+    },
+        {
+            "text": "ELEC HYD PUMP SYS A",
+        "x": 31.757925072046113,
+        "y": 94.36507936507937
+    ,
+      "cb": "C00881",
+      "location": "F3"
+    },
+        {
+            "text": "XFR BUS 2 SECT 1",
+        "x": 43.976945244956774,
+        "y": 94.36507936507937
+    ,
+      "cb": "C03011",
+      "location": "F4"
+    },
+        {
+            "text": "XFER BUS 2 SECT 2",
+        "x": 56.42651296829971,
+        "y": 94.36507936507937
+    ,
+      "cb": "C03012",
+      "location": "F5"
+    },
+        {
+            "text": "MAIN BUS 2",
+        "x": 68.58789625360231,
+        "y": 94.36507936507937
+    ,
+      "cb": "C00817",
+      "location": "F6"
+    },
+        {
+            "text": "GALLEY BUS A",
+        "x": 81.21037463976946,
+        "y": 94.44444444444444
+    ,
+      "cb": "C00912",
+      "location": "F7"
+    },
+        {
+            "text": "GALLEY BUS B",
+        "x": 93.54466858789625,
+        "y": 94.36507936507937
+    ,
+      "cb": "C00914",
+      "location": "F8"
+    }
+]
+     
+    
+};
+
+    const panelSelect = document.getElementById('panelSelect');
+    const searchBox = document.getElementById('searchBox');
+    const resultsList = document.getElementById('resultsList');
+    const panelImg = document.getElementById('panel-img');
+    const container = document.getElementById('container');
+    const status = document.getElementById('status');
+
+    // Paneli ve Kırmızı Halkayı Yükleyen Fonksiyon
+    function navigateToCB(panelKey, cbText, x, y) {
+        panelSelect.value = panelKey;
+        panelImg.src = `paneller_max/${panelKey}.PNG`;
+        panelImg.style.display = 'block';
+
+        // Resim yüklenirken hafif bir gecikme ile marker'ı yerleştir
+        setTimeout(() => {
+            clearMarkers();
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            marker.style.left = x + "%";
+            marker.style.top = y + "%";
+            container.appendChild(marker);
+            
+            status.innerHTML = `<strong>${panelKey.toUpperCase()}</strong>: ${cbText} işaretlendi.`;
+            marker.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 150);
+    }
+
+    // Arama Motoru (Tüm panelleri gezer)
+  // Arama Motoru (Tüm panelleri gezer)
+    searchBox.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toUpperCase();
+        resultsList.innerHTML = "";
+        
+        // --- DEĞİŞİKLİK BURADA BAŞLIYOR ---
+        // Arama silinirse veya 2 karakterden azsa her şeyi temizle
+        if (query.length < 2) {
+            clearMarkers(); // Kırmızı halkayı siler ⭕✨
+            resultsList.innerHTML = '<p style="color: #444; font-size: 0.85rem;">En az 2 karakter girin.</p>';
+            status.innerText = "Arama temizlendi.";
+            return;
+        }
+        // --- DEĞİŞİKLİK BURADA BİTİYOR ---
+
+        let totalMatches = 0;
+
+       for (const panelID in allPanelsData) {
+    // Görsel etiket için P18_1 -> P18-1 dönüşümü
+    const panelTag = panelID.replace('_', '-');
+
+    const matches = allPanelsData[panelID].filter(cb => {
+        const queryLower = query.toLowerCase();
+        
+        // Arama kriterleri: 
+        // 1. Text içinde (VOR/MKR vb.)
+        // 2. CB numarasında (C0014 vb.)
+        // 3. PanelID + Lokasyon birleşiminde (P18-1 B12 vb.)
+        // 4. Sadece lokasyonda (B12)
+        
+        return (
+            cb.text.toLowerCase().includes(queryLower) || 
+            (cb.cb && cb.cb.toLowerCase().includes(queryLower)) ||
+            (cb.location && cb.location.toLowerCase().includes(queryLower)) ||
+            (`${panelTag} ${cb.location}`.toLowerCase().includes(queryLower))
+        );
+    });
+
+    matches.forEach(cb => {
+        totalMatches++;
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        // Arama sonuç listesinde CB no ve Lokasyonu da gösterelim
+        item.innerHTML = `
+            <span class="res-panel-tag">${panelTag}</span>
+            <div class="res-text">
+                <strong>${cb.text}</strong><br>
+                <small style="color: #aaa;">CB: ${cb.cb || '-'} | Loc: ${cb.location || '-'}</small>
+            </div>
+        `;
+        item.onclick = () => navigateToCB(panelID, cb.text, cb.x, cb.y);
+        resultsList.appendChild(item);
+    });
+}
+
+        status.innerText = `${totalMatches} sonuç bulundu.`;
+        if (totalMatches === 0) resultsList.innerHTML = '<p style="color: #666;">Eşleşme bulunamadı.</p>';
+    });
+
+    panelSelect.addEventListener('change', (e) => {
+        const key = e.target.value;
+        if (!key) return;
+        panelImg.src = `paneller_max/${key}.PNG`;
+        panelImg.style.display = 'block';
+        clearMarkers();
+        status.innerText = `${key} paneli yüklendi.`;
+    });
+
+    function clearMarkers() {
+        document.querySelectorAll('.marker').forEach(m => m.remove());
+    }
+document.getElementById('clearBtn').addEventListener('click', function() {
+    // 1. Input alanını temizle
+    const searchBox = document.getElementById('searchBox');
+    searchBox.value = '';
+
+    // 2. Yan paneldeki sonuç listesini sıfırla
+    const resultsList = document.getElementById('resultsList');
+    if (resultsList) {
+        resultsList.innerHTML = '<p style="color: #666; font-size: 0.85rem; padding: 10px;">Arama temizlendi. Yeni bir CB arayabilirsiniz.</p>';
+    }
+
+    // 3. Harita üzerindeki (resim üzerindeki) kırmızı halkaları temizle
+    if (typeof clearMarkers === "function") {
+        clearMarkers();
+    }
+
+    // 4. Durum mesajını güncelle
+    const status = document.getElementById('status');
+    if (status) {
+        status.innerText = "Bekleniyor...";
+    }
+
+    // 5. Tekrar arama kutusuna odaklan
+    searchBox.focus();
+});
+</script>
+
+</body>
+</html>
