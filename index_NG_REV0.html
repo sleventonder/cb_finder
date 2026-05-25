@@ -629,7 +629,7 @@
       "location": ""
     },
         {
-            "text": "MACH TRIM AC",
+            "text": "AFCS SYS A MACH TRIM AC",
             "x": 51.19047619047619,
             "y": 42.00426439232409,
       "cb": "C0456",
@@ -701,11 +701,11 @@
       "location": "D01"
     },
         {
-            "text": "MACH TRIM DC",
+            "text": "AFCS SYS A MACH TRIM DC",
             "x": 51.28205128205128,
             "y": 62.046908315565034,
-      "cb": "C0456 OR C0457",
-      "location": "C04 OR D04"
+      "cb": "C0457",
+      "location": "D04"
     },
         
                 {
@@ -721,13 +721,6 @@
             "y": 63.46837242359631,
       "cb": "C1048",
       "location": "D03"
-    },
-        {
-            "text": "MACH TRIM DC",
-            "x": 51.19047619047619,
-            "y": 63.46837242359631,
-      "cb": "C0456 OR C0457",
-      "location": "C04 OR D04"
     },
         {
             "text": "MCP DC 1",
@@ -2003,7 +1996,10 @@
       "location": ""
     }
     ],
-    "p6_1": [
+    
+    
+ 
+    "p6_1": [   /* BURASI TAMAM. CBLER OK, DEĞERLER OK, CB VE LOKASYON OK 25MAY2026  */
         {
             "text": "RADIO NAVIGATION",
             "x": 73.73563218390805,
@@ -2019,61 +2015,53 @@
       "location": ""
     },
         {
-            "text": "C1377 NAV SENSOR DC-2",
+            "text": "NAV SENSOR DC-2",
             "x": 57.18390804597702,
             "y": 13.20754716981132,
-      "cb": "",
-      "location": ""
+      "cb": "C1377",
+      "location": "A10"
     },
         {
-            "text": "C1379 NAV CONTROL PANEL 2",
+            "text": "NAV CONTROL PANEL 2",
             "x": 84.77011494252874,
             "y": 13.379073756432247,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "C1385 RADIO ALTIMETER 2" ,
-            "x": 90.17241379310344,
-            "y": 13.293310463121784,
-      "cb": "",
-      "location": ""
-    },
-        
+      "cb": "C1379",
+      "location": "A15"
+    },      
         {
             "text": "VOR 2",
             "x": 68.2183908045977,
             "y": 15.008576329331047,
-      "cb": "",
-      "location": ""
+      "cb": "C1375",
+      "location": "A12"
     },
         {
             "text": "MMR 2",
             "x": 73.67816091954023,
             "y": 14.493996569468267,
-      "cb": "",
-      "location": ""
+      "cb": "C1480",
+      "location": "A13"
     },
         {
             "text": "DME 2",
             "x": 79.19540229885057,
             "y": 14.493996569468267,
-      "cb": "",
-      "location": ""
+      "cb": "C192",
+      "location": "A14"
     },
               {
             "text": "RADIO ALTIMETER 2",
             "x": 90.22988505747126,
             "y": 14.57975986277873,
-      "cb": "",
-      "location": ""
+      "cb": "C1385",
+      "location": "A16"
     },
         {
-            "text": "ADF 2",
+            "text": "ADF 2 (INOP)",
             "x": 95.7471264367816,
             "y": 14.493996569468267,
-      "cb": "",
-      "location": ""
+      "cb": "C1383",
+      "location": "A17"
     },
           {
             "text": "ENTERTAINMENT",
@@ -2087,7 +2075,7 @@
             "x": 95.7471264367816,
             "y": 25.38593481989708,
       "cb": "",
-      "location": ""
+      "location": "ROW_B"
     },
         {
             "text": "SMYD-2",
@@ -2100,36 +2088,36 @@
             "text": "SMYD 2 SENSOR EXC AC",
             "x": 24.597701149425287,
             "y": 28.216123499142366,
-      "cb": "",
-      "location": ""
+      "cb": "C1207",
+      "location": "B4"
     },
         {
             "text": "SMYD 2 COMPTR DC",
             "x": 29.48275862068965,
             "y": 28.90222984562607,
-      "cb": "",
-      "location": ""
+      "cb": "C1206",
+      "location": "B5"
     },
         {
             "text": "STICK SHAKER RIGHT",
             "x": 35.11494252873563,
             "y": 28.90222984562607,
-      "cb": "",
-      "location": ""
+      "cb": "C1393",
+      "location": "B6"
     },
         {
             "text": "MACH WARNING SYS-2",
             "x": 40.57471264367816,
             "y": 28.30188679245283,
-      "cb": "",
-      "location": ""
+      "cb": "C549",
+      "location": "B7"
     },
         {
             "text": "AUDIO DC",
             "x": 57.18390804597702,
             "y": 29.588336192109775,
-      "cb": "",
-      "location": ""
+      "cb": "C1584",
+      "location": "B10"
     },
           {
             "text": "COMMUNICATIONS",
@@ -2150,14 +2138,14 @@
             "x": 95.7471264367816,
             "y": 39.62264150943396,
       "cb": "",
-      "location": ""
+      "location": "ROW_C"
     },
         {
-            "text": "PA TAPE RPDR AC",
+            "text": "PA TAPE RPDR AC (PRAM)",
             "x": 51.609195402298845,
             "y": 42.109777015437395,
-      "cb": "",
-      "location": ""
+      "cb": "C80",
+      "location": "C9"
     },
         {
             "text": "ADIRU RIGHT",
@@ -2170,51 +2158,51 @@
             "text": "PA SYS BAT",
             "x": 35.0,
             "y": 43.310463121783876,
-      "cb": "",
-      "location": ""
+      "cb": "C1583",
+      "location": "C6"
     },
             {
             "text": "ADIRU RIGHT AC",
             "x": 79.47126436781609,
             "y": 43.310463121783876,
-      "cb": "",
-      "location": ""
+      "cb": "C1008",
+      "location": "C14"
     },
 {
             "text": "ADIRU RIGHT EXC",
             "x": 85.47126436781609,
             "y": 43.310463121783876,
-      "cb": "",
-      "location": ""
+      "cb": "C426",
+      "location": "C15"
     },
 {
             "text": "ADIRU RIGHT DC",
             "x": 95.47126436781609,
             "y": 43.310463121783876,
-      "cb": "",
-      "location": ""
+      "cb": "C1010",
+      "location": "C17"
     },
 
         {
             "text": "VHF 2",
             "x": 18.620689655172416,
             "y": 44.339622641509436,
-      "cb": "",
-      "location": ""
+      "cb": "C166",
+      "location": "C3"
     },
         {
-            "text": "AUDIO",
+            "text": "ENT AUDIO",
             "x": 46.264367816091955,
             "y": 44.339622641509436,
-      "cb": "",
-      "location": ""
+      "cb": "C1456",
+      "location": "C8"
     },
            {
             "text": "MUX",
             "x": 57.24137931034483,
             "y": 44.339622641509436,
-      "cb": "",
-      "location": ""
+      "cb": "C1101",
+      "location": "C10"
     },
            {
             "text": "DISPLAY",
@@ -2228,21 +2216,21 @@
             "x": 95.6896551724138,
             "y": 57.97598627787307,
       "cb": "",
-      "location": ""
+      "location": "ROW_D"
     },
         {
             "text": "PA AMP BAT",
             "x": 23.96551724137931,
             "y": 60.4631217838765,
-      "cb": "",
-      "location": ""
+      "cb": "C82",
+      "location": "D4"
     },
         {
-            "text": "WEATHER RADAR RT",
+            "text": "WEATHER RADAR RT, WXR",
             "x": 73.73563218390805,
             "y": 60.291595197255575,
-      "cb": "",
-      "location": ""
+      "cb": "C120",
+      "location": "D13"
     },
         {
             "text": "FMCS",
@@ -2255,65 +2243,60 @@
             "text": "DEU 2 HOLDUP",
             "x": 51.49425287356322,
             "y": 62.0926243567753,
-      "cb": "",
-      "location": ""
+      "cb": "C1362",
+      "location": "D9"
     },
         {
             "text": "DEU 1 HOLDUP",
             "x": 57.18390804597702,
             "y": 62.17838765008577,
-      "cb": "",
-      "location": ""
+      "cb": "C1361",
+      "location": "D10"
     },
         {
             "text": "DEU 2 PRI",
             "x": 62.52873563218391,
             "y": 61.492281303602056,
-      "cb": "",
-      "location": ""
+      "cb": "C1360",
+      "location": "D11"
     },
-        {
-            "text": "WXR",
-            "x": 73.67816091954023,
-            "y": 61.57804459691252,
-      "cb": "",
-      "location": ""
+    {
+            "text": "ATTENDANT PANELS",
+            "x": 67.52873563218391,
+            "y": 61.492281303602056,
+      "cb": "C1936",
+      "location": "D12"
     },
+        
         {
             "text": "ATC AC",
             "x": 79.02298850574712,
             "y": 61.57804459691252,
-      "cb": "",
-      "location": ""
+      "cb": "C188",
+      "location": "D14"
     },
         {
             "text": "FMCS MCDU 2",
             "x": 84.71264367816092,
             "y": 61.57804459691252,
-      "cb": "",
-      "location": ""
+      "cb": "C1239",
+      "location": "D15"
     },
         {
             "text": "FMCS CMPTR 2",
             "x": 90.11494252873563,
             "y": 61.492281303602056,
-      "cb": "",
-      "location": ""
+      "cb": "C1262",
+      "location": "D16"
     },
           {
             "text": "HF 2",
             "x": 35.0,
             "y": 62.692967409948544,
-      "cb": "",
-      "location": ""
+      "cb": "C857",
+      "location": "D6"
     },
-        {
-            "text": "DEU 2 PRI",
-            "x": 62.47126436781609,
-            "y": 62.778730703259,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "DISPLAY",
             "x": 65.3448275862069,
@@ -2326,77 +2309,57 @@
             "x": 95.6896551724138,
             "y": 77.70154373927959,
       "cb": "",
-      "location": ""
+      "location": "ROW_E"
     },
         {
             "text": "F/O EFIS CONT PANEL",
             "x": 73.62068965517241,
             "y": 79.93138936535163,
-      "cb": "",
-      "location": ""
+      "cb": "C1370",
+      "location": "E13"
     },
         {
             "text": "ATC ANT SWITCH",
             "x": 79.19540229885057,
             "y": 80.0171526586621,
-      "cb": "",
-      "location": ""
+      "cb": "C1194",
+      "location": "E14"
     },
-        {
-            "text": "INOP E5",
-            "x": 29.770114942528735,
-            "y": 81.73241852487135,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "INOP E8",
-            "x": 46.49425287356322,
-            "y": 81.38936535162951,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "INOP E9",
-            "x": 51.839080459770116,
-            "y": 81.21783876500858,
-      "cb": "",
-      "location": ""
-    },
+       
         {
             "text": "F/O OUTBD",
             "x": 57.18390804597702,
             "y": 81.90394511149228,
-      "cb": "",
-      "location": ""
+      "cb": "C1364",
+      "location": "E10"
     },
         {
             "text": "F/O INBD",
             "x": 62.70114942528736,
             "y": 81.90394511149228,
-      "cb": "",
-      "location": ""
+      "cb": "C1366",
+      "location": "E11"
     },
         {
             "text": "CTR LWR",
             "x": 68.10344827586206,
             "y": 81.73241852487135,
-      "cb": "",
-      "location": ""
+      "cb": "C1373",
+      "location": "E12"
     },
         {
             "text": "FMCS XFR",
             "x": 84.71264367816092,
             "y": 81.81818181818183,
-      "cb": "",
-      "location": ""
+      "cb": "C1263",
+      "location": "E15"
     },
         {
             "text": "BACR27XXXOCC19",
             "x": 93.10344827586206,
             "y": 94.08233276157804,
       "cb": "",
-      "location": ""
+      "location": "ROW_NUMBER"
     },
 
 {
@@ -2404,10 +2367,36 @@
             "x": 23.96551724137931,
             "y": 81.90394511149228,
       "cb": "",
-      "location": ""
+      "location": "E4"
     },
-
-
+{
+            "text": "PRINTER (INOP)",
+            "x": 29.96551724137931,
+            "y": 81.90394511149228,
+      "cb": "C1216",
+      "location": "E5"
+    },
+{
+            "text": "ACARS MU AC (INOP)",
+            "x": 40.56551724137931,
+            "y": 81.90394511149228,
+      "cb": "C0744",
+      "location": "E7"
+    },
+{
+            "text": "CMU-1 AC (INOP)",
+            "x": 45.96551724137931,
+            "y": 81.90394511149228,
+      "cb": "C1483",
+      "location": "E8"
+    },
+    {
+            "text": "CMU/ACARS DC (INOP)",
+            "x": 51.46551724137931,
+            "y": 81.90394511149228,
+      "cb": "C1500",
+      "location": "E9"
+    },
         {
             "text": "P6-1",
             "x": 95.22988505747126,
@@ -2491,6 +2480,7 @@
     }
     ],
     "p6_2": [
+    /* KOMPLE TAMAM ŞEKİL ,CB, YAZI, LOKASYON CXX GBİ 25MAY2026 */
         {
             "text": "FLIGHT CONTROL",
             "x": 37.43500866551127,
@@ -2513,32 +2503,32 @@
       "location": ""
     },
         {
-            "text": "BACR27XXXRACD 6J=",
+            "text": "BACR27XXXRACD6J=",
             "x": 96.93818601964182,
             "y": 13.048933500627353,
       "cb": "",
-      "location": ""
+      "location": "ROW_A"
     },
         {
-            "text": "ENGINE",
+            "text": "ENGINE VIB MONITOR",
             "x": 8.376660889659156,
             "y": 15.558343789209536,
-      "cb": "",
-      "location": ""
+      "cb": "C1076",
+      "location": "A1"
     },
         {
             "text": "FLAP LOAD RELIEF",
             "x": 24.783362218370883,
             "y": 15.558343789209536,
-      "cb": "",
-      "location": ""
+      "cb": "C566",
+      "location": "A6"
     },
         {
-            "text": "C0210 FLAP SHUTOFF VALVES",
+            "text": "FLAP SHUTOFF VALVES",
             "x": 28.827267475447716,
             "y": 15.683814303638647,
-      "cb": "",
-      "location": ""
+      "cb": "C0210 ",
+      "location": "A7"
     },
         {
             "text": "T.E. FLAP POS",
@@ -2551,15 +2541,15 @@
             "text": "BRAKE PRESS IND",
             "x": 53.03292894280762,
             "y": 15.683814303638647,
-      "cb": "",
-      "location": ""
+      "cb": "C306",
+      "location": "A13"
     },
         {
             "text": "ENG PUMP DEPRESS VALVE 2",
             "x": 69.38186019641826,
             "y": 15.809284818067754,
-      "cb": "",
-      "location": ""
+      "cb": "C780",
+      "location": "A17"
     },
         {
             "text": "FIRE DETECTION",
@@ -2568,21 +2558,37 @@
       "cb": "",
       "location": ""
     },
-        {
-            "text": "ENGINE VIBRATION MONITOR",
-            "x": 8.376660889659156,
-            "y": 17.691342534504393,
+      {
+            "text": "AFCS INTLK 2",
+            "x": 12.376660889659156,
+            "y": 15.691342534504393,
+      "cb": "C1631",
+      "location": "A3"
+    },
+{
+            "text": "SPOILER PCU SOV",
+            "x": 18.376660889659156,
+            "y": 14.691342534504393,
       "cb": "",
       "location": ""
     },
-      
-        {
-            "text": "FLAP SHUTOFF VALVES",
-            "x": 28.769497400346623,
-            "y": 17.44040150564617,
-      "cb": "",
-      "location": ""
+
+{
+            "text": "SPOILER PCU SOV SYS A",
+            "x": 16.376660889659156,
+            "y": 18.691342534504393,
+      "cb": "C1662",
+      "location": "A4"
     },
+{
+
+            "text": "SPOILER PCU SOV SYS B",
+            "x": 20.816660889659156,
+            "y": 18.691342534504393,
+      "cb": "C1663",
+      "location": "A5"
+    },
+        
         {
             "text": "FSEU",
             "x": 34.95089543616407,
@@ -2590,26 +2596,41 @@
       "cb": "",
       "location": ""
     },
+
+ {
+            "text": "SPEED BRAKE AUTO STOW",
+            "x": 40.97284806470248,
+            "y": 16.318695106649937,
+      "cb": "C1611",
+      "location": "A10"
+    },
+    {
+            "text": "FSEU DC 1",
+            "x": 33.07284806470248,
+            "y": 18.318695106649937,
+      "cb": "C211",
+      "location": "A8"
+    },
         {
             "text": "FSEU DC 2",
             "x": 36.97284806470248,
             "y": 18.318695106649937,
-      "cb": "",
-      "location": ""
+      "cb": "C1468",
+      "location": "A9"
     },
         {
             "text": "T.E. FLAP POS SKEW SENSOR IND RH",
             "x": 44.945118428653956,
             "y": 17.565872020075282,
-      "cb": "",
-      "location": ""
+      "cb": "C1443",
+      "location": "A11"
     },
         {
             "text": "T.E. FLAP POS SKEW SENSOR IND LH",
             "x": 47.89139225880994,
             "y": 17.691342534504393,
-      "cb": "",
-      "location": ""
+      "cb": "C213",
+      "location": "A12"
     },
              {
             "text": "PTU VALVE",
@@ -2618,40 +2639,54 @@
       "cb": "",
       "location": ""
     },
+     {
+            "text": "PTU VALVE CONT 1",
+            "x": 61.200462160600814,
+            "y": 17.565872020075282,
+      "cb": "C1081",
+      "location": "A15"
+    },
+     {
+            "text": "PTU VALVE CONT 2",
+            "x": 65.200462160600814,
+            "y": 17.565872020075282,
+      "cb": "C1085",
+      "location": "A16"
+    },
              {
             "text": "'OVHT WW WING BODY",
             "x": 77.52744078567302,
             "y": 16.938519447929735,
-      "cb": "",
-      "location": ""
+      "cb": "C388",
+      "location": "A19"
     },
         {
-            "text": "MA WRN& CONT",
-            "x": 84.63316002310803,
+            "text": "MA WRN & CONT",
+            "x": 85.63316002310803,
             "y": 17.691342534504393,
-      "cb": "",
-      "location": ""
+      "cb": "C396",
+      "location": "A21"
     },
               {
             "text": "FIRE DETECTION ENG 2",
             "x": 89.65915655690353,
             "y": 18.444165621079048,
-      "cb": "",
-      "location": ""
+      "cb": "C407",
+      "location": "A22"
     },
         {
             "text": "FIRE DETECTION APU",
             "x": 93.52975158867707,
             "y": 18.569636135508155,
-      "cb": "",
-      "location": ""
+      "cb": "C403",
+      "location": "A23"
     },
         {
             "text": "FIRE DETECTION ENG 1",
             "x": 97.4581166955517,
             "y": 18.444165621079048,
-      "cb": "",
-      "location": ""
+      "cb": "C405",
+      "location": "A24"
     },
         {
             "text": "AFCS SYS B",
@@ -2686,7 +2721,7 @@
             "x": 96.93818601964182,
             "y": 33.12421580928482,
       "cb": "",
-      "location": ""
+      "location": "ROW_B"
     },
         {
             "text": "ENGINE 2 START LEVER",
@@ -2697,31 +2732,38 @@
     },
         {
             "text": "ENGINE 2 START LEVER CHAN A",
-            "x": 27.61409589832467,
+            "x": 24.61409589832467,
             "y": 35.633626097867,
-      "cb": "",
-      "location": ""
+      "cb": "C1318",
+      "location": "B6"
+    },
+    {
+            "text": "ENGINE 2 START LEVER CHAN B",
+            "x": 28.61409589832467,
+            "y": 35.633626097867,
+      "cb": "C1319",
+      "location": "B7"
     },
         {
             "text": "ELEV TAB VLV RH",
             "x": 32.755632582322356,
             "y": 35.75909661229611,
-      "cb": "",
-      "location": ""
+      "cb": "C1464",
+      "location": "B8"
     },
         {
             "text": "AUTO SPEED BRAKE",
             "x": 36.79953783939919,
             "y": 35.88456712672522,
-      "cb": "",
-      "location": ""
+      "cb": "C440",
+      "location": "B9"
     },
         {
             "text": "STAB TRIM CONT",
             "x": 40.90121317157712,
             "y": 35.88456712672522,
-      "cb": "",
-      "location": ""
+      "cb": "C207",
+      "location": "B10"
     },
         {
             "text": "FLIGHT CONTROL SHUTOFF VALVES",
@@ -2734,15 +2776,15 @@
             "text": "ENG PUMP DEPRESS VALVE 1",
             "x": 61.19641825534373,
             "y": 35.633626097867,
-      "cb": "",
-      "location": ""
+      "cb": "C779",
+      "location": "B15"
     },
         {
             "text": "APU FIRE SW POWER",
             "x": 77.46967071057192,
             "y": 35.75909661229611,
-      "cb": "",
-      "location": ""
+      "cb": "C1344",
+      "location": "B19"
     },
         {
             "text": "FIRE EXTINGUISHERS",
@@ -2755,120 +2797,87 @@
             "text": "WARN LIGHT BAT",
             "x": 4.217215482380127,
             "y": 36.38644918444165,
-      "cb": "",
-      "location": ""
+      "cb": "C374",
+      "location": "B1"
     },
                  {
             "text": "FCC DC",
             "x": 12.478336221837088,
             "y": 37.76662484316186,
-      "cb": "",
-      "location": ""
+      "cb": "C1046",
+      "location": "B3"
     },
         {
             "text": "ENGAGE INTLK",
             "x": 16.34893125361063,
             "y": 37.39021329987453,
-      "cb": "",
-      "location": ""
+      "cb": "C716",
+      "location": "B4"
     },
         {
-            "text": "RUN/POWER",
+            "text": "ENG 2 RUN/POWER",
             "x": 20.50837666088966,
             "y": 37.51568381430364,
-      "cb": "",
-      "location": ""
+      "cb": "C1313",
+      "location": "B5"
     },
-        {
-            "text": "ENG 2 START LEVER CHAN A",
-            "x": 24.610051993067593,
-            "y": 37.0138017565872,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "ELEV TAB VLV RH",
-            "x": 32.00462160600809,
-            "y": 37.13927227101631,
-      "cb": "",
-      "location": ""
-    },
-              {
-            "text": "AUTOSPEED BRAKE",
-            "x": 36.85730791450029,
-            "y": 37.76662484316186,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "STAB TRIM CONT",
-            "x": 40.872328134026574,
-            "y": 37.82936010037641,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "SHUTOFF VALVES SPOILER",
             "x": 49.104563835932986,
             "y": 38.393977415307404,
-      "cb": "",
-      "location": ""
+      "cb": "C204",
+      "location": "B12"
     },
         {
-            "text": "FLT CONT",
+            "text": "SHUTOFF VALVES FLT CONT",
             "x": 52.975158867706526,
             "y": 37.641154328732746,
-      "cb": "",
-      "location": ""
+      "cb": "C363",
+      "location": "B13"
     },
         {
-            "text": "AUTO SLAT DC ",
+            "text": "AUTO SLAT DC 2 ",
             "x": 57.019064124783355,
             "y": 37.13927227101631,
-      "cb": "",
-      "location": ""
+      "cb": "C1070",
+      "location": "B14"
     },
-            {
-            "text": "APU FIRE SW POWER",
-            "x": 77.35413056036973,
-            "y": 37.641154328732746,
-      "cb": "",
-      "location": ""
-    },
+            
              {
             "text": "EXTINGUISHERS RIGHT",
             "x": 81.51357596764875,
             "y": 38.393977415307404,
-      "cb": "",
-      "location": ""
+      "cb": "C297",
+      "location": "B20"
     },
         {
             "text": "EXTINGUISHERS APU",
             "x": 85.67302137492779,
             "y": 38.393977415307404,
-      "cb": "",
-      "location": ""
+      "cb": "C452",
+      "location": "B21"
     },
         {
             "text": "EXTINGUISHERS LEFT",
             "x": 89.60138648180242,
             "y": 38.64491844416562,
-      "cb": "",
-      "location": ""
+      "cb": "C296",
+      "location": "B22"
     },
         {
             "text": "EXTINGUISHERS RIGHT ALTN RIGHT",
             "x": 94.37839399191219,
             "y": 37.76662484316186,
-      "cb": "",
-      "location": ""
+      "cb": "C1022",
+      "location": "B23"
     },
 {
             "text": "EXTINGUISHERS RIGHT ALTN LEFT",
             "x": 97.37839399191219,
             "y": 37.76662484316186,
-      "cb": "",
-      "location": ""
+      "cb": "C1021",
+      "location": "B24"
     },
 
         {
@@ -2897,7 +2906,7 @@
             "x": 76.89196995956095,
             "y": 52.57214554579674,
       "cb": "",
-      "location": ""
+      "location": "ROW_C"
     },
         {
             "text": "INTERPHONE POWER",
@@ -2907,11 +2916,11 @@
       "location": ""
     },
         {
-            "text": "MACH TRIM AC",
+            "text": "AFCS SYS B MACH TRIM AC",
             "x": 4.274985557481225,
             "y": 55.70890840652447,
-      "cb": "",
-      "location": ""
+      "cb": "C1037",
+      "location": "C1"
     },
         {
             "text": "ENGINE 2 THRUST REVERSER",
@@ -2931,8 +2940,8 @@
             "text": "RUDDER AUTHORITY LIMITER",
             "x": 37.030618139803586,
             "y": 55.70890840652447,
-      "cb": "",
-      "location": ""
+      "cb": "C1447",
+      "location": "C9"
     },
         {
             "text": "SHUTOFF VALVES",
@@ -2941,13 +2950,7 @@
       "cb": "",
       "location": ""
     },
-        {
-            "text": "AUTO SLAT DC 1",
-            "x": 57.134604274985556,
-            "y": 55.20702634880803,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "LDG GR SYS XFR VALVE",
             "x": 63.258232235701904,
@@ -2966,58 +2969,52 @@
             "text": "AFCS SYS B SNSR EXC AC",
             "x": 8.31889081455806,
             "y": 56.46173149309912,
-      "cb": "",
-      "location": ""
+      "cb": "C1042",
+      "location": "C2"
     },
         {
             "text": "MCP DC 2",
             "x": 12.420566146735991,
             "y": 57.08908406524466,
-      "cb": "",
-      "location": ""
+      "cb": "C1047",
+      "location": "C3"
     },
         {
-            "text": "START VALVE",
+            "text": "ENG 2 START VALVE",
             "x": 16.34893125361063,
             "y": 57.08908406524466,
-      "cb": "",
-      "location": ""
+      "cb": "C154",
+      "location": "C4"
     },
         {
             "text": "ENGINE 2 REVERSER SYNCLOCK",
             "x": 20.623916811091856,
             "y": 57.08908406524466,
-      "cb": "",
-      "location": ""
+      "cb": "C1267",
+      "location": "C5"
     },
         {
             "text": "STBY RUDDER SHUTOFF VALVE",
             "x": 45.00288850375506,
             "y": 56.46173149309912,
-      "cb": "",
-      "location": ""
+      "cb": "C362",
+      "location": "C11"
     },
         {
             "text": "FLT CONTROL SHUTOFF VALVE",
             "x": 53.03292894280762,
             "y": 56.46173149309912,
-      "cb": "",
-      "location": ""
+      "cb": "C1074",
+      "location": "C13"
     },
         {
             "text": "AUTOSLAT DC 1",
             "x": 57.134604274985556,
             "y": 56.46173149309912,
-      "cb": "",
-      "location": ""
+      "cb": "C1068",
+      "location": "C14"
     },
-        {
-            "text": "LANDING GEAR XFR VALVE",
-            "x": 63.258232235701904,
-            "y": 56.2107904642409,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "FO INTERPHONE POWER",
             "x": 87.69497400346621,
@@ -3032,68 +3029,55 @@
       "cb": "",
       "location": ""
     },
-        {
-            "text": "AFCS SYS B SNSR EXC AC",
-            "x": 8.31889081455806,
-            "y": 57.71643663739021,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "ENGINE 2 REVERSER INTLK",
             "x": 24.66782206816869,
             "y": 57.71643663739021,
-      "cb": "",
-      "location": ""
+      "cb": "C1413",
+      "location": "C6"
     },
         {
             "text": "ENGINE 2 REVERSER CONT",
             "x": 28.827267475447716,
             "y": 57.84190715181933,
-      "cb": "",
-      "location": ""
+      "cb": "C277",
+      "location": "C7"
     },
         {
             "text": "ENGINE 2 REVERSER IND",
             "x": 32.755632582322356,
             "y": 57.71643663739021,
-      "cb": "",
-      "location": ""
-    },
-              {
-            "text": "STBY RUD SHUTOFF VALVE",
-            "x": 45.00288850375506,
-            "y": 57.71643663739021,
-      "cb": "",
-      "location": ""
+      "cb": "C1004",
+      "location": "C8"
     },
         {
-            "text": "FLT CONT SHUTOFF VALVE",
-            "x": 53.090699017908726,
-            "y": 57.71643663739021,
-      "cb": "",
-      "location": ""
-    },
-        {
-            "text": "LDG GR SYS XFR VALVE",
+            "text": "LDG GR SYS XFR VALVE SEC",
             "x": 61.23627960716349,
             "y": 57.84190715181933,
-      "cb": "",
-      "location": ""
+      "cb": "C799",
+      "location": "C15"
+    },
+    {
+            "text": "LDG GR SYS XFR VALVE PRI",
+            "x": 65.23627960716349,
+            "y": 57.84190715181933,
+      "cb": "C781",
+      "location": "C16"
     },
         {
             "text": "ENG 2 SHUTOFF VALVE",
             "x": 73.0791450028885,
             "y": 57.84190715181933,
-      "cb": "",
-      "location": ""
+      "cb": "C348",
+      "location": "C18"
     },
         {
             "text": "ENG 1 SHUTOFF VALVE",
             "x": 77.18082033506644,
             "y": 57.84190715181933,
-      "cb": "",
-      "location": ""
+      "cb": "C347",
+      "location": "C19"
     },
         {
             "text": "FO INTERPHONE POWER DC 2",
@@ -3106,8 +3090,8 @@
             "text": "FO INTERPHONE POWER BAT",
             "x": 89.65915655690353,
             "y": 57.84190715181933,
-      "cb": "",
-      "location": ""
+      "cb": "C560",
+      "location": "C21"
     },
         {
             "text": "CAPT INTERPHONE POWERDC 2",
@@ -3155,22 +3139,23 @@
             "text": "ENGINE 2 ALTN PWR CHAN A",
             "x": 32.40901213171577,
             "y": 76.03513174404016,
-      "cb": "",
-      "location": ""
+      "cb": "C1315",
+      "location": "D8"
     },
-        {
-            "text": "FLIGHT CONTROL ALTN T.E. FLAP DRIVE",
-            "x": 53.14846909300982,
-            "y": 75.53324968632371,
-      "cb": "",
-      "location": ""
-    },
+        
         {
             "text": "INTPH AND WARN",
             "x": 85.6152512998267,
             "y": 75.53324968632371,
-      "cb": "",
-      "location": ""
+      "cb": "C84",
+      "location": "C21"
+    },
+    {
+            "text": "TAKEOFF WARNING LIGHT",
+            "x": 81.6152512998267,
+            "y": 75.53324968632371,
+      "cb": "C1698",
+      "location": "C20"
     },
         {
             "text": "OVERWING FLIGHT LOCK",
@@ -3179,73 +3164,112 @@
       "cb": "",
       "location": ""
     },
+    
         {
             "text": "OVERWING FLIGHT LOCK RIGHT",
+            "x": 3.865857885615252,
+            "y": 77.41530740276035,
+      "cb": "C1515",
+      "location": "D1"
+    },
+    
+        {
+            "text": "OVERWING FLIGHT LOCK LEFT",
+            "x":8.365857885615252,
+            "y": 77.41530740276035,
+      "cb": "C1514",
+      "location": "D2"
+    },
+    {
+            "text": "AFCS SYS B RUD DC",
+            "x": 12.522241478913923,
+            "y": 76.04265997490589,
+      "cb": "C1630",
+      "location": "D3"
+      },
+        {
+            "text": "ENG 2 IGNITION RIGHT",
             "x": 16.522241478913923,
             "y": 78.04265997490589,
-      "cb": "",
-      "location": ""
-    },
+      "cb": "C459",
+      "location": "D4"
+      },
             {
-            "text": "OVERWING FLIGHT LOCK LEFT",
+            "text": "ENG 2 IGNITION LH STBY",
+            "x": 20.436741767764296,
+            "y": 78.04265997490589,
+      "cb": "C1625",
+      "location": "D5"
+    },
+   
+            {
+            "text": "ENG 2 IGNITION LEFT",
             "x": 24.436741767764296,
             "y": 78.04265997490589,
-      "cb": "",
-      "location": ""
+      "cb": "C151",
+      "location": "D6"
     },
         {
             "text": "ENGINE 2 ALTN PWR CHAN B",
             "x": 28.711727325245523,
             "y": 76.78795483061481,
-      "cb": "",
-      "location": ""
+      "cb": "C1391",
+      "location": "D7"
     },
         {
             "text": "STAB TRIM ACTUATOR",
             "x": 41.01675332177932,
             "y": 77.41530740276035,
-      "cb": "",
-      "location": ""
+      "cb": "C840",
+      "location": "D10"
     },
         {
             "text": "ALTN T.E. FLAP DRIVE",
             "x": 53.20623916811091,
             "y": 77.28983688833124,
-      "cb": "",
-      "location": ""
+      "cb": "C841",
+      "location": "D13"
     },
         {
             "text": "FORCE FIGHT MONITOR",
             "x": 61.23627960716349,
             "y": 76.78795483061481,
-      "cb": "",
-      "location": ""
+      "cb": "C1628",
+      "location": "D15"
     },
         {
             "text": "TRIM IND RUD",
             "x": 65.16464471403813,
             "y": 77.41530740276035,
-      "cb": "",
-      "location": ""
+      "cb": "C786",
+      "location": "D16"
     },
         {
-            "text": "TRIM CONT AIL RUD",
-            "x": 75.33217793183131,
+            "text": "TRIM CONT AIL",
+            "x": 73.33217793183131,
             "y": 76.91342534504392,
-      "cb": "",
-      "location": ""
+      "cb": "C786",
+      "location": "D18"
     },
+    {
+            "text": "TRIM CONT RUD",
+            "x": 77.33217793183131,
+            "y": 76.91342534504392,
+      "cb": "C787",
+      "location": "D19"
+    },
+    
             {
-            "text": "AUDIO CAPT",
+            "text": "AUDIO",
             "x": 93.81860196418256,
             "y": 77.03889585947302,
       "cb": "",
       "location": ""
     },
         {
-            "text": "TRIM CONT RUD",
-            "x": 77.58521086077413,
-            "y": 78.29360100376411,
+            "text": "TRIM CONT",
+            "x": 75.58521086077413,
+            "y": 75.29360100376411,
       "cb": "",
       "location": ""
     },
@@ -3253,29 +3277,29 @@
             "text": "AUDIO FO",
             "x": 89.77469670710572,
             "y": 78.29360100376411,
-      "cb": "",
-      "location": ""
+      "cb": "C86",
+      "location": "D22"
     },
         {
             "text": "AUDIO CAPT",
             "x": 93.81860196418256,
             "y": 78.29360100376411,
-      "cb": "",
-      "location": ""
+      "cb": "C83",
+      "location": "D23"
     },
         {
             "text": "AUDIO OBS",
             "x": 97.80473714615829,
             "y": 78.29360100376411,
-      "cb": "",
-      "location": ""
+      "cb": "C85",
+      "location": "D24"
     },
         {
             "text": "BACR27XXX",
             "x": 95.72501444251877,
             "y": 92.47176913425345,
       "cb": "",
-      "location": ""
+      "location": "ROW_NUMBER"
     },
         {
             "text": "P6-2",
@@ -3285,19 +3309,12 @@
       "location": ""
     },
         {
-            "text": "MACH TRIM DC",
+            "text": "AFCS SYS B MACH TRIM DC",
             "x": 8.31889081455806,
             "y": 36.19824341279799,
-      "cb": "",
-      "location": ""
+      "cb": "C1064",
+      "location": "B2"
     },
-        {
-            "text": "ENGINE 2 START LEVER CHAN B",
-            "x": 28.74061236279607,
-            "y": 36.95106649937265,
-      "cb": "",
-      "location": ""
-    }
     ],
     "p6_3": [
         {
